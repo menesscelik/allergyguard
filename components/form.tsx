@@ -1,0 +1,93 @@
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type TextInputProps,
+} from 'react-native';
+
+import { Palette, Radius } from '@/constants/theme';
+
+export const PRIMARY = Palette.primary;
+
+type FormInputProps = TextInputProps & {
+  label: string;
+};
+
+export function FormInput({ label, style, ...props }: FormInputProps) {
+  return (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        placeholderTextColor={Palette.textMuted}
+        style={[styles.input, style]}
+        {...props}
+      />
+    </View>
+  );
+}
+
+type PrimaryButtonProps = {
+  title: string;
+  onPress: () => void;
+  loading?: boolean;
+  disabled?: boolean;
+};
+
+export function PrimaryButton({ title, onPress, loading, disabled }: PrimaryButtonProps) {
+  const isDisabled = disabled || loading;
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={isDisabled}
+      style={({ pressed }) => [
+        styles.button,
+        (pressed || isDisabled) && styles.buttonDim,
+      ]}>
+      {loading ? (
+        <ActivityIndicator color={Palette.white} />
+      ) : (
+        <Text style={styles.buttonText}>{title}</Text>
+      )}
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  field: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Palette.textSecondary,
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Palette.borderStrong,
+    borderRadius: Radius.medium,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: Palette.text,
+    backgroundColor: Palette.surface,
+  },
+  button: {
+    backgroundColor: PRIMARY,
+    borderRadius: Radius.medium,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonDim: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: Palette.white,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+});

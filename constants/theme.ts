@@ -5,25 +5,67 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+/**
+ * AllergyGuard color system.
+ * Vibrant teal communicates energy and trust; indigo and coral add personality.
+ */
+export const Palette = {
+  primary: '#0B8178',
+  primaryPressed: '#08665F',
+  primarySoft: '#CCFBF1',
+  primaryBorder: '#5EEAD4',
+  accent: '#4F46E5',
+  accentSoft: '#E0E7FF',
+  onPrimaryMuted: 'rgba(255, 255, 255, 0.72)',
+  onPrimarySurface: 'rgba(255, 255, 255, 0.14)',
+  background: '#F7F8FC',
+  surface: '#FFFFFF',
+  surfaceMuted: '#EEF2FF',
+  text: '#172033',
+  textSecondary: '#5B6478',
+  textMuted: '#8B93A7',
+  border: '#E2E5F0',
+  borderStrong: '#CBD0DF',
+  success: '#059669',
+  successSoft: '#D1FAE5',
+  successBright: '#6EE7B7',
+  warning: '#B45309',
+  warningSoft: '#FEF3C7',
+  warningBorder: '#FCD34D',
+  severityMild: '#CA8A04',
+  severityModerate: '#EA580C',
+  danger: '#E11D48',
+  dangerSoft: '#FFE4E6',
+  premium: '#7C3AED',
+  premiumSoft: '#EDE9FE',
+  premiumBorder: '#C4B5FD',
+  white: '#FFFFFF',
+  black: '#0A1719',
+} as const;
+
+export const Radius = {
+  small: 10,
+  medium: 14,
+  large: 20,
+  pill: 999,
+} as const;
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: Palette.text,
+    background: Palette.background,
+    tint: Palette.primary,
+    icon: Palette.textSecondary,
+    tabIconDefault: Palette.textMuted,
+    tabIconSelected: Palette.primary,
   },
   dark: {
     text: '#ECEDEE',
     background: '#151718',
-    tint: tintColorDark,
+    tint: Palette.primaryBorder,
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: Palette.primaryBorder,
   },
 };
 
