@@ -1,8 +1,10 @@
 import { Stack } from 'expo-router';
 
 import { Palette } from '@/constants/theme';
+import { useLocalization } from '@/lib/localization-context';
 
 export default function AuthLayout() {
+  const { t } = useLocalization();
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />
@@ -10,7 +12,7 @@ export default function AuthLayout() {
         name="register"
         options={{
           headerShown: true,
-          title: 'Kayıt Ol',
+          title: t('auth.register.title'),
           headerBackTitle: 'Geri',
           headerBackButtonDisplayMode: 'default',
           headerShadowVisible: false,

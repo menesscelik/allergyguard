@@ -71,6 +71,8 @@ export type AnalysisResult = {
   tested_drug_name: string;
   tested_ingredients: string[];
   used_fallback: boolean;
+  evidence_sources?: string[];
+  analysis_method?: string;
 };
 
 export const RISK_META: Record<RiskLevel, { label: string; emoji: string; color: string; bg: string }> = {

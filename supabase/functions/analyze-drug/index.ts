@@ -1,6 +1,6 @@
-// Edge Function: analyze-drug
-// Kullanıcının alerji listesiyle test edilen ilacı karşılaştırır:
-// haftalık limit kontrolü → OpenAI risk analizi → drug_checks kaydı.
+// AllergyGuard drug analysis
+// Deterministic TİTCK/RxNorm ingredient matching decides the risk.
+// OpenAI only explains the already-decided result in the user's language.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -9,8 +9,11 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+type RiskLevel = 'safe' | 'warning' | 'danger';
+type SupabaseAdmin = ReturnType<typeof createClient>;
+type CanonicalIngredient = { name: string; normalized: string; rxcui: string | null };
 type AnalysisResult = {
-  risk_level: 'safe' | 'warning' | 'danger';
+  risk_level: RiskLevel;
   matched_ingredients: string[];
   explanation: string;
   recommendation: string;
@@ -23,7 +26,6 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-// Bu haftanın Pazartesi tarihi (YYYY-MM-DD) — Postgres date_trunc('week') ile uyumlu
 function currentWeekStart(): string {
   const now = new Date();
   const daysSinceMonday = (now.getUTCDay() + 6) % 7;
@@ -31,246 +33,283 @@ function currentWeekStart(): string {
   return monday.toISOString().slice(0, 10);
 }
 
-function normalize(s: string): string {
-  return s.toLocaleLowerCase('tr').trim();
+function normalize(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('en')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
-async function callOpenAI(
-  allergyList: string[],
-  drugName: string,
-  ingredients: string[],
-  precomputedMatches: string[],
-  language: string
-): Promise<AnalysisResult | null> {
-  const apiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!apiKey) return null;
+function parseIngredients(value: string | null): string[] {
+  return String(value ?? '')
+    .split(',')
+    .map((item) => item.replace(/combinations?/i, '').trim())
+    .filter(Boolean);
+}
 
-  const systemPrompt =
-    'Sen bir ilaç güvenlik asistanısın. Kullanıcının alerjik olduğu etken maddelerle test edilen ilacın ' +
-    'etken maddelerini karşılaştırırsın. Tıbbi tavsiye vermezsin; sadece etken madde karşılaştırması yaparsın. ' +
-    'Türkçe ve İngilizce ilaç/madde adlarının aynı maddeyi ifade edebileceğini bil (örn. "asetilsalisilik asit" = ' +
-    '"acetylsalicylic acid" = "aspirin") ve çapraz reaksiyon riski bilinen madde ailelerini (örn. NSAID\'ler, ' +
-    'penisilinler) değerlendir. Emin olamadığın durumda daha temkinli seviyeyi seç. ' +
-    'Yanıtını SADECE şu JSON şemasıyla ver: {"risk_level": "safe|warning|danger", ' +
-    '"matched_ingredients": ["..."], "explanation": "...", "recommendation": "..."}. ' +
-    'explanation ve recommendation alanlarını kullanıcının dilinde yaz.';
-
-  const userPrompt = JSON.stringify({
-    user_allergic_ingredients: allergyList,
-    tested_drug_name: drugName,
-    tested_drug_ingredients: ingredients,
-    exact_text_matches: precomputedMatches,
-    user_language: language,
-  });
-
+async function fetchJson(url: string): Promise<any | null> {
   try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: 0.2,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-      }),
-    });
-    if (!res.ok) {
-      console.error('OpenAI error:', res.status, await res.text());
-      return null;
-    }
-    const data = await res.json();
-    const parsed = JSON.parse(data.choices?.[0]?.message?.content ?? '');
-    if (!['safe', 'warning', 'danger'].includes(parsed.risk_level)) return null;
-    return {
-      risk_level: parsed.risk_level,
-      matched_ingredients: Array.isArray(parsed.matched_ingredients) ? parsed.matched_ingredients : [],
-      explanation: String(parsed.explanation ?? ''),
-      recommendation: String(parsed.recommendation ?? ''),
-    };
-  } catch (err) {
-    console.error('OpenAI call failed:', err);
+    const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
     return null;
   }
 }
 
-// OpenAI erişilemezse kural tabanlı yedek analiz
-function fallbackAnalysis(matches: string[], hasIngredientData: boolean, language: string): AnalysisResult {
+async function rxCuiForIngredient(name: string): Promise<string | null> {
+  const data = await fetchJson(
+    `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=${encodeURIComponent(name)}&search=2`
+  );
+  return data?.idGroup?.rxnormId?.[0] ?? null;
+}
+
+async function canonicalizeIngredients(names: string[]): Promise<CanonicalIngredient[]> {
+  const unique = [...new Set(names.map((name) => name.trim()).filter(Boolean))].slice(0, 30);
+  return await Promise.all(
+    unique.map(async (name) => ({ name, normalized: normalize(name), rxcui: await rxCuiForIngredient(name) }))
+  );
+}
+
+async function ingredientsFromTrDrugs(admin: SupabaseAdmin, drugName: string): Promise<string[]> {
+  const { data } = await admin
+    .from('tr_drugs')
+    .select('ingredient_en')
+    .ilike('name', drugName)
+    .limit(1)
+    .maybeSingle();
+  return parseIngredients(data?.ingredient_en ?? null);
+}
+
+function fallbackExplanation(
+  risk: RiskLevel,
+  matches: string[],
+  language: string
+): Pick<AnalysisResult, 'explanation' | 'recommendation'> {
   const tr = language !== 'en';
-  if (matches.length > 0) {
+  if (risk === 'danger') {
     return {
-      risk_level: 'danger',
-      matched_ingredients: matches,
       explanation: tr
-        ? `Alerji listenle eşleşen madde(ler) bulundu: ${matches.join(', ')}.`
-        : `Matched ingredient(s) with your allergy list: ${matches.join(', ')}.`,
-      recommendation: tr ? 'Bu ilacı kullanmadan önce mutlaka doktoruna danış.' : 'Consult your doctor before using this drug.',
+        ? `Doğrulanmış etken madde eşleşmesi bulundu: ${matches.join(', ')}.`
+        : `A verified active-ingredient match was found: ${matches.join(', ')}.`,
+      recommendation: tr
+        ? 'Bu ilacı kullanmadan önce doktoruna veya eczacına danış.'
+        : 'Consult your doctor or pharmacist before using this medicine.',
     };
   }
-  if (!hasIngredientData) {
+  if (risk === 'warning') {
     return {
-      risk_level: 'warning',
-      matched_ingredients: [],
       explanation: tr
-        ? 'İlacın etken maddeleri doğrulanamadı, karşılaştırma eksik olabilir.'
-        : 'Active ingredients could not be verified; comparison may be incomplete.',
-      recommendation: tr ? 'Prospektüsü kontrol et ve doktoruna danış.' : 'Check the leaflet and consult your doctor.',
+        ? 'Etken madde verisi tam olarak doğrulanamadığı için güvenilir bir karşılaştırma yapılamadı.'
+        : 'A reliable comparison could not be completed because ingredient data was not fully verified.',
+      recommendation: tr
+        ? 'Prospektüsü kontrol et ve ilacı kullanmadan önce bir sağlık uzmanına danış.'
+        : 'Check the leaflet and consult a healthcare professional before use.',
     };
   }
   return {
-    risk_level: 'safe',
-    matched_ingredients: [],
     explanation: tr
-      ? 'Alerji listenle bilinen bir etken madde eşleşmesi bulunamadı.'
-      : 'No known ingredient match with your allergy list.',
+      ? 'TİTCK ve RxNorm verileriyle doğrudan bir etken madde eşleşmesi bulunmadı.'
+      : 'No direct active-ingredient match was found using TİTCK and RxNorm data.',
     recommendation: tr
-      ? 'Yine de ilk kullanımda dikkatli ol; şüphen varsa doktoruna danış.'
-      : 'Still be careful on first use; consult your doctor if in doubt.',
+      ? 'Bu sonuç tüm alerji ve çapraz reaksiyonları dışlamaz; şüphen varsa doktoruna danış.'
+      : 'This does not rule out every allergy or cross-reaction; consult your doctor if unsure.',
   };
 }
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+async function explainWithOpenAI(
+  risk: RiskLevel,
+  matches: string[],
+  testedDrugName: string,
+  testedIngredients: string[],
+  language: string
+): Promise<Pick<AnalysisResult, 'explanation' | 'recommendation'> | null> {
+  const apiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!apiKey) return null;
 
   try {
-    // Kullanıcıyı doğrula (istemciden gelen JWT ile)
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        temperature: 0,
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'allergyguard_explanation',
+            strict: true,
+            schema: {
+              type: 'object',
+              properties: {
+                explanation: { type: 'string' },
+                recommendation: { type: 'string' },
+              },
+              required: ['explanation', 'recommendation'],
+              additionalProperties: false,
+            },
+          },
+        },
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You explain a deterministic medicine ingredient comparison. The risk level and matches are fixed by code. ' +
+              'Never change, reinterpret, or add a diagnosis, cross-reaction, ingredient, or risk. Do not give medical advice. ' +
+              'Briefly explain the supplied evidence and recommend consulting a doctor or pharmacist. Use the requested language.',
+          },
+          {
+            role: 'user',
+            content: JSON.stringify({
+              fixed_risk_level: risk,
+              verified_matches: matches,
+              tested_drug_name: testedDrugName,
+              verified_tested_ingredients: testedIngredients,
+              language,
+            }),
+          },
+        ],
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const parsed = JSON.parse(data.choices?.[0]?.message?.content ?? '');
+    return {
+      explanation: String(parsed.explanation),
+      recommendation: String(parsed.recommendation),
+    };
+  } catch (error) {
+    console.error('OpenAI explanation failed:', error);
+    return null;
+  }
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  try {
     const authHeader = req.headers.get('Authorization') ?? '';
     const userClient = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { Authorization: authHeader } } }
     );
-    const {
-      data: { user },
-    } = await userClient.auth.getUser();
-    if (!user) {
-      return json({ error: 'unauthorized', message: 'Oturum bulunamadı.' }, 401);
-    }
+    const { data: { user } } = await userClient.auth.getUser();
+    if (!user) return json({ error: 'unauthorized', message: 'Oturum bulunamadı.' }, 401);
 
-    // Sistem işlemleri için service role (RLS bypass)
     const admin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
-
     const body = await req.json();
-    const drugName: string = String(body.drugName ?? '').trim();
-    const ingredients: string[] = Array.isArray(body.ingredients)
-      ? body.ingredients.map((i: unknown) => String(i)).filter(Boolean)
+    const drugName = String(body.drugName ?? '').trim();
+    const suppliedIngredients = Array.isArray(body.ingredients)
+      ? body.ingredients.map((item: unknown) => String(item).trim()).filter(Boolean)
       : [];
-    const rxcui: string | null = body.rxcui ? String(body.rxcui) : null;
-    const language: string = body.language === 'en' ? 'en' : 'tr';
+    const rxcui = body.rxcui ? String(body.rxcui) : null;
+    const language = body.language === 'en' ? 'en' : 'tr';
+    if (!drugName) return json({ error: 'invalid_input', message: 'İlaç adı gerekli.' }, 400);
 
-    if (!drugName) {
-      return json({ error: 'invalid_input', message: 'İlaç adı gerekli.' }, 400);
+    // Fast non-authoritative quota check. The RPC below is the final atomic gate.
+    const [{ data: profile }, { data: usage }] = await Promise.all([
+      admin.from('profiles').select('is_premium').eq('id', user.id).single(),
+      admin.from('weekly_usage').select('check_count').eq('user_id', user.id)
+        .eq('week_start', currentWeekStart()).maybeSingle(),
+    ]);
+    if (!profile?.is_premium && (usage?.check_count ?? 0) >= 1) {
+      return json({
+        error: 'weekly_limit',
+        message: language === 'en'
+          ? 'Your free check for this week has been used. It renews Monday.'
+          : 'Bu haftaki ücretsiz test hakkın doldu. Hakkın Pazartesi yenilenir.',
+      }, 429);
     }
 
-    // Haftalık limit kontrolü
-    const { data: profile } = await admin
-      .from('profiles')
-      .select('is_premium')
-      .eq('id', user.id)
-      .single();
-    const weekStart = currentWeekStart();
-    const { data: usage } = await admin
-      .from('weekly_usage')
-      .select('id, check_count')
-      .eq('user_id', user.id)
-      .eq('week_start', weekStart)
-      .maybeSingle();
-    const used = usage?.check_count ?? 0;
-
-    if (!profile?.is_premium && used >= 1) {
-      return json(
-        {
-          error: 'weekly_limit',
-          message: 'Bu haftaki ücretsiz test hakkın doldu. Hakkın Pazartesi yenilenir.',
-        },
-        429
-      );
+    let testedIngredientNames = suppliedIngredients;
+    const evidenceSources = new Set<string>();
+    if (testedIngredientNames.length > 0) evidenceSources.add(rxcui ? 'RxNorm' : 'TİTCK');
+    if (testedIngredientNames.length === 0) {
+      testedIngredientNames = await ingredientsFromTrDrugs(admin, drugName);
+      if (testedIngredientNames.length > 0) evidenceSources.add('TİTCK');
     }
+    const testedIngredients = await canonicalizeIngredients(testedIngredientNames);
+    if (testedIngredients.some((item) => item.rxcui)) evidenceSources.add('RxNorm');
 
-    // Kullanıcının alerjileri
     const { data: allergies } = await admin
       .from('allergies')
       .select('drug_name, active_ingredients')
       .eq('user_id', user.id);
 
-    const allergySet = new Set<string>();
-    for (const a of allergies ?? []) {
-      if (a.drug_name) allergySet.add(a.drug_name);
-      for (const ing of (a.active_ingredients as string[]) ?? []) allergySet.add(ing);
+    const allergyNames: string[] = [];
+    let unresolvedAllergy = false;
+    for (const allergy of allergies ?? []) {
+      let names = Array.isArray(allergy.active_ingredients)
+        ? (allergy.active_ingredients as unknown[]).map(String).filter(Boolean)
+        : [];
+      if (names.length === 0) names = await ingredientsFromTrDrugs(admin, String(allergy.drug_name));
+      if (names.length === 0) unresolvedAllergy = true;
+      allergyNames.push(...names);
     }
-    const allergyList = [...allergySet];
+    const allergyIngredients = await canonicalizeIngredients(allergyNames);
+    if (allergyIngredients.some((item) => item.rxcui)) evidenceSources.add('RxNorm');
 
-    // Birebir metin eşleşmeleri (AI'ya ipucu + yedek analiz için)
-    const testedSet = new Set([drugName, ...ingredients].map(normalize));
-    const exactMatches = allergyList.filter((a) => testedSet.has(normalize(a)));
+    const allergyKeys = new Set(
+      allergyIngredients.flatMap((item) => [item.normalized, item.rxcui ? `rxcui:${item.rxcui}` : ''])
+        .filter(Boolean)
+    );
+    const matches = testedIngredients
+      .filter((item) => allergyKeys.has(item.normalized) || (!!item.rxcui && allergyKeys.has(`rxcui:${item.rxcui}`)))
+      .map((item) => item.name);
 
-    // AI analizi; başarısız olursa kural tabanlı yedek
-    let result = await callOpenAI(allergyList, drugName, ingredients, exactMatches, language);
-    let usedFallback = false;
-    if (!result) {
-      result = fallbackAnalysis(exactMatches, ingredients.length > 0, language);
-      usedFallback = true;
-    }
+    const risk: RiskLevel = matches.length > 0
+      ? 'danger'
+      : testedIngredients.length === 0 || unresolvedAllergy
+        ? 'warning'
+        : 'safe';
+    const fallback = fallbackExplanation(risk, matches, language);
+    const aiExplanation = await explainWithOpenAI(
+      risk, matches, drugName, testedIngredients.map((item) => item.name), language
+    );
+    const explanation = aiExplanation ?? fallback;
 
-    // GÜVENLİK KİLİDİ: kod birebir eşleşme bulduysa sonuç asla 'safe' olamaz.
-    // AI yanılsa bile deterministik eşleşme her zaman 'danger'a çeker.
-    if (exactMatches.length > 0 && result.risk_level !== 'danger') {
-      result.risk_level = 'danger';
-      result.matched_ingredients = [...new Set([...result.matched_ingredients, ...exactMatches])];
-      result.recommendation =
-        language === 'en'
-          ? 'Do not use this drug before consulting your doctor.'
-          : 'Doktoruna danışmadan bu ilacı kullanma.';
-    }
-    // Tutarlılık: AI eşleşme listelediyse ama 'safe' dediyse en az 'warning'e çek
-    if (result.risk_level === 'safe' && result.matched_ingredients.length > 0) {
-      result.risk_level = 'warning';
-    }
-
-    // Sonucu kaydet
-    await admin.from('drug_checks').insert({
-      user_id: user.id,
-      tested_drug_name: drugName,
-      tested_ingredients: ingredients,
-      risk_level: result.risk_level,
-      matched_ingredients: result.matched_ingredients,
-      ai_explanation: result.explanation,
-      ai_recommendation: result.recommendation,
-      language,
+    const { data: recorded, error: recordError } = await admin.rpc('record_drug_check_with_quota', {
+      p_user_id: user.id,
+      p_tested_drug_name: drugName,
+      p_tested_ingredients: testedIngredients.map((item) => item.name),
+      p_risk_level: risk,
+      p_matched_ingredients: matches,
+      p_explanation: explanation.explanation,
+      p_recommendation: explanation.recommendation,
+      p_language: language,
     });
-
-    // Haftalık kullanımı artır
-    if (usage) {
-      await admin
-        .from('weekly_usage')
-        .update({ check_count: used + 1 })
-        .eq('id', usage.id);
-    } else {
-      await admin
-        .from('weekly_usage')
-        .insert({ user_id: user.id, week_start: weekStart, check_count: 1 });
+    if (recordError) {
+      console.error('record_drug_check_with_quota error:', recordError);
+      return json({ error: 'record_failed', message: 'Analiz kaydedilemedi.' }, 500);
+    }
+    if (!recorded?.allowed) {
+      return json({ error: 'weekly_limit', message: language === 'en'
+        ? 'Your free check for this week has been used. It renews Monday.'
+        : 'Bu haftaki ücretsiz test hakkın doldu. Hakkın Pazartesi yenilenir.' }, 429);
     }
 
     return json({
-      ...result,
+      risk_level: risk,
+      matched_ingredients: matches,
+      explanation: explanation.explanation,
+      recommendation: explanation.recommendation,
       tested_drug_name: drugName,
-      tested_ingredients: ingredients,
+      tested_ingredients: testedIngredients.map((item) => item.name),
       rxcui,
-      used_fallback: usedFallback,
-      remaining_checks: profile?.is_premium ? null : 0,
+      used_fallback: !aiExplanation,
+      evidence_sources: [...evidenceSources],
+      analysis_method: 'deterministic_ingredient_match_v2',
+      remaining_checks: recorded.remaining_checks,
     });
-  } catch (err) {
-    console.error('analyze-drug error:', err);
+  } catch (error) {
+    console.error('analyze-drug error:', error);
     return json({ error: 'internal', message: 'Analiz sırasında bir hata oluştu.' }, 500);
   }
 });

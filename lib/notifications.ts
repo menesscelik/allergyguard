@@ -49,14 +49,16 @@ function parseTime(remindTime: string): { hour: number; minute: number } {
   return { hour: h || 0, minute: m || 0 };
 }
 
-async function scheduleReminder(reminder: Reminder) {
+async function scheduleReminder(reminder: Reminder, language: 'tr' | 'en') {
   const { hour, minute } = parseTime(reminder.remind_time);
   for (const day of reminder.repeat_days) {
     await Notifications.scheduleNotificationAsync({
       identifier: `reminder-${reminder.id}-${day}`,
       content: {
-        title: 'İlaç Vakti 💊',
-        body: `${reminder.drug_name} zamanı!${reminder.notes ? ` (${reminder.notes})` : ''}`,
+        title: language === 'en' ? 'Medicine Time 💊' : 'İlaç Vakti 💊',
+        body: language === 'en'
+          ? `Time for ${reminder.drug_name}!${reminder.notes ? ` (${reminder.notes})` : ''}`
+          : `${reminder.drug_name} zamanı!${reminder.notes ? ` (${reminder.notes})` : ''}`,
         sound: 'default',
         data: { reminder_id: reminder.id },
       },
@@ -85,16 +87,24 @@ export async function syncAllNotifications() {
     .select('*')
     .eq('is_active', true);
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('language')
+    .maybeSingle();
+  const language: 'tr' | 'en' = profile?.language === 'en' ? 'en' : 'tr';
+
   for (const r of (reminders ?? []) as Reminder[]) {
-    await scheduleReminder(r);
+    await scheduleReminder(r, language);
   }
 
   // Haftalık test hakkı bildirimi — her Pazartesi 09:00
   await Notifications.scheduleNotificationAsync({
     identifier: 'weekly-quota-reset',
     content: {
-      title: 'Test hakkın yenilendi 🎉',
-      body: 'Bu hafta 1 ücretsiz ilaç testi hakkın var.',
+      title: language === 'en' ? 'Your check renewed 🎉' : 'Test hakkın yenilendi 🎉',
+      body: language === 'en'
+        ? 'You have 1 free drug check this week.'
+        : 'Bu hafta 1 ücretsiz ilaç testi hakkın var.',
       sound: 'default',
     },
     trigger: {

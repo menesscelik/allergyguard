@@ -6,6 +6,7 @@ import 'react-native-reanimated';
 
 import { Palette } from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/lib/auth-context';
+import { LocalizationProvider, useLocalization } from '@/lib/localization-context';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -13,6 +14,7 @@ export const unstable_settings = {
 
 function RootNavigator() {
   const { session, loading } = useAuth();
+  const { t } = useLocalization();
 
   if (loading) {
     return (
@@ -24,26 +26,29 @@ function RootNavigator() {
 
   return (
     <Stack>
-      <Stack.Screen
-        name="reset-password"
-        options={{ title: 'Yeni Şifre', headerBackButtonDisplayMode: 'minimal' }}
-      />
       <Stack.Protected guard={!!session}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="add-allergy"
-          options={{ presentation: 'modal', title: 'Alerji Ekle' }}
+          options={{ presentation: 'modal', title: t('allergies.addTitle') }}
         />
-        <Stack.Screen name="drug-result" options={{ title: 'İlaç Analizi' }} />
-        <Stack.Screen name="scan" options={{ title: 'Barkod Tara' }} />
+        <Stack.Screen name="drug-result" options={{ title: t('analysis.title') }} />
+        <Stack.Screen name="scan" options={{ title: t('scan.title') }} />
         <Stack.Screen
           name="add-reminder"
-          options={{ presentation: 'modal', title: 'Hatırlatıcı Ekle' }}
+          options={{ presentation: 'modal', title: t('reminders.addTitle') }}
         />
       </Stack.Protected>
       <Stack.Protected guard={!session}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
+      {/* Deklarasyon sırası önemli: bu ekran en sonda kalmalı, yoksa oturum yokken
+          ilk erişilebilir ekran olarak login yerine bu açılır. Buraya normal akışta
+          gidilmez; sadece şifre sıfırlama e-postasındaki bağlantı yönlendirir. */}
+      <Stack.Screen
+        name="reset-password"
+        options={{ title: t('auth.reset.navTitle'), headerBackButtonDisplayMode: 'minimal' }}
+      />
     </Stack>
   );
 }
@@ -65,7 +70,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={navigationTheme}>
       <AuthProvider>
-        <RootNavigator />
+        <LocalizationProvider>
+          <RootNavigator />
+        </LocalizationProvider>
       </AuthProvider>
       <StatusBar style="dark" />
     </ThemeProvider>

@@ -47,6 +47,7 @@
         }
       ],
       "@react-native-community/datetimepicker",
+      "expo-localization",
       "./plugins/without-push-entitlement.js"
     ],
     "experiments": {

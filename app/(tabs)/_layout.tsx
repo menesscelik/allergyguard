@@ -6,8 +6,10 @@ import { PRIMARY } from '@/components/form';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Palette } from '@/constants/theme';
 import { syncAllNotifications } from '@/lib/notifications';
+import { useLocalization } from '@/lib/localization-context';
 
 export default function TabLayout() {
+  const { t } = useLocalization();
   // Uygulama açılınca zamanlanmış bildirimleri veritabanıyla eşitle
   useEffect(() => {
     syncAllNotifications().catch(() => {});
@@ -33,28 +35,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Alerjilerim',
+          title: t('tabs.allergies'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
         }}
       />
       <Tabs.Screen
         name="test"
         options={{
-          title: 'İlaç Testi',
+          title: t('tabs.test'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="pills.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="reminders"
         options={{
-          title: 'Hatırlatıcı',
+          title: t('tabs.reminders'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="alarm.fill" color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profil',
+          title: t('tabs.profile'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />

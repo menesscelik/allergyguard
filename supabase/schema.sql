@@ -179,3 +179,6 @@ create policy "notifications_select_own" on notifications_log
 -- subscriptions: sadece okuma (yazma RevenueCat webhook'u ile)
 create policy "subscriptions_select_own" on subscriptions
   for select using (auth.uid() = user_id);
+
+-- Analiz kaydı + haftalık kota tek transaction içinde işlenir.
+-- Tam tanım: supabase/migrations/20260705203000_atomic_drug_check_quota.sql

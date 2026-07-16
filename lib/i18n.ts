@@ -1,0 +1,182 @@
+import { I18n } from 'i18n-js';
+
+export type AppLanguage = 'tr' | 'en';
+
+export const i18n = new I18n({
+  tr: {
+    common: {
+      error: 'Hata', cancel: 'Vazgeç', delete: 'Sil', save: 'Kaydet', add: 'Ekle',
+      email: 'E-posta', password: 'Şifre', optional: 'opsiyonel', retry: 'Tekrar Dene',
+      loading: 'Yükleniyor...', ok: 'Tamam', unknown: 'Bilinmiyor', mild: 'Hafif', moderate: 'Orta', severe: 'Şiddetli',
+    },
+    tabs: { allergies: 'Alerjilerim', test: 'İlaç Testi', reminders: 'Hatırlatıcı', profile: 'Profil' },
+    auth: {
+      login: {
+        eyebrow: 'SAĞLIĞIN, KONTROLÜNDE', subtitle: 'Alerjilerini tanı, ilaçlarını daha güvenli kontrol et.',
+        personalCheck: 'Kişisel alerji kontrolü', barcode: 'Hızlı barkod tarama', remember: 'Beni hatırla',
+        forgot: 'Şifremi unuttum', submit: 'Giriş Yap', noAccount: 'Hesabın yok mu?', register: 'Kayıt ol',
+        missing: 'E-posta ve şifreni gir.', failed: 'Giriş başarısız',
+      },
+      register: {
+        title: 'Kayıt Ol', subtitle: 'Alerji listeni oluşturmaya başla', name: 'Ad Soyad',
+        namePlaceholder: 'Adın Soyadın', passwordHint: 'En az 6 karakter', submit: 'Kayıt Ol',
+        hasAccount: 'Zaten hesabın var mı?', login: 'Giriş yap', missing: 'Tüm alanları doldur.',
+        weak: 'Şifre en az 6 karakter olmalı.', checkEmail: 'E-postanı kontrol et',
+        confirmEmail: 'Hesabını doğrulamak için e-postana gelen bağlantıya tıkla, sonra giriş yap.',
+      },
+      forgot: {
+        title: 'Şifre Sıfırlama', subtitle: 'Kayıtlı e-posta adresini gir, sana 6 haneli doğrulama kodu gönderelim.',
+        submit: 'Kod Gönder', back: 'Girişe dön', missing: 'E-posta adresini gir.', sent: 'Kod gönderildi',
+        sentMessage: 'E-postana 6 haneli doğrulama kodu gönderildi. (Spam klasörünü de kontrol et.)',
+      },
+      reset: {
+        navTitle: 'Yeni Şifre', title: 'Yeni şifreni belirle', subtitle: 'E-postana gelen 6 haneli kodu ve yeni şifreni gir.',
+        invalid: 'Kod geçersiz veya süresi dolmuş', request: 'Yeni kod iste', newPassword: 'Yeni şifre',
+        repeat: 'Yeni şifre tekrar', repeatPlaceholder: 'Şifreni tekrar yaz', update: 'Şifreyi Güncelle',
+        verifying: 'Bağlantı doğrulanıyor...', mismatchTitle: 'Şifreler eşleşmiyor', mismatch: 'İki alana da aynı şifreyi yaz.',
+        updated: 'Şifre güncellendi', updatedMessage: 'Yeni şifrenle giriş yapabilirsin.',
+        missingSession: 'Şifre sıfırlama oturumu bulunamadı.', linkFailed: 'Bağlantı doğrulanamadı.',
+        code: 'Doğrulama kodu', codePlaceholder: '6 haneli kod', codeMissing: 'E-postana gelen 6 haneli kodu gir.',
+      },
+    },
+    allergies: {
+      greeting: 'MERHABA', hero: 'Daha güvenli seçimler.', active_one: '1 alerji kaydın aktif olarak korunuyor.',
+      active_other: '%{count} alerji kaydın aktif olarak korunuyor.', start: 'İlk alerji kaydını ekleyerek korumanı başlat.',
+      protection: 'Koruma aktif', quick: 'HIZLI İŞLEMLER', today: 'Bugün ne yapmak istersin?', test: 'İlaç test et',
+      risk: 'Riski öğren', scan: 'Barkod tara', find: 'Hızlıca bul', remind: 'Hatırlat', setTime: 'Saatini kur',
+      records: 'Alerji kayıtların', pendingIngredient: 'Etken madde bilgisi bekleniyor',
+      ingredientCount_one: '1 etken madde kayıtlı', ingredientCount_other: '%{count} etken madde kayıtlı',
+      emptyTitle: 'Henüz alerji eklemedin', emptyText: 'Alerjik olduğun ilaçları ekle; yeni ilaçları bu listeyle karşılaştıralım.',
+      deleteTitle: 'Alerjiyi Sil', deleteMessage: '“%{name}” listeden silinsin mi?', loadError: 'Alerjiler yüklenemedi: %{message}',
+      addTitle: 'Alerji Ekle', editTitle: 'Alerjiyi Düzenle', scanAdd: 'Barkod ile Ekle', drugName: 'İlaç adı *',
+      drugPlaceholder: 'örn. Aspirin', reactionSeverity: 'Reaksiyon şiddeti', reactionNotes: 'Reaksiyon notları',
+      reactionPlaceholder: 'örn. Nefes darlığı, kızarıklık...', selectedIngredient: 'Etken madde: %{ingredients}',
+    },
+    drugTest: {
+      eyebrow: 'AKILLI İLAÇ KONTROLÜ', title: 'İlacını test et', subtitle: 'Etken maddeleri alerji listenle karşılaştıralım.',
+      premium: '⭐ Premium — sınırsız test', quota: 'Bu hafta %{left}/1 test hakkın var', quotaFull: 'Bu haftaki hakkın doldu — Pazartesi yenilenir',
+      placeholder: 'İlaç adı yaz (örn. ibuprofen)', search: 'Ara', scan: 'Barkod ile hızlı tara', minChars: 'En az 2 karakter yaz.',
+      searchFailed: 'Arama başarısız oldu. İnternet bağlantını kontrol edip tekrar dene.', ingredient: 'Etken madde: %{ingredients}',
+      analyze: 'Riski analiz et →', noResult: 'Sonuç bulunamadı. İlacın etken madde adıyla aramayı dene.',
+      empty: 'Haftada 1 ücretsiz test hakkın var. Türkçe marka bulunamazsa etken maddeyle ara.',
+    },
+    reminders: {
+      eyebrow: 'GÜNLÜK RUTİNİN', title: 'Hatırlatıcılar', subtitle: 'İlaç saatlerini kaçırma.', emptyTitle: 'Henüz hatırlatıcı yok',
+      emptyText: 'İlaç saatlerini ekle; vakti gelince telefonuna bildirim gelsin — internet olmasa bile çalışır.',
+      everyday: 'Her gün', weekdays: 'Hafta içi', deleteTitle: 'Hatırlatıcıyı Sil', deleteMessage: '“%{name}” hatırlatıcısı silinsin mi?',
+      addTitle: 'Hatırlatıcı Ekle', editTitle: 'Hatırlatıcıyı Düzenle', time: 'Saat', days: 'Günler', notes: 'Not (opsiyonel)',
+      notesPlaceholder: 'örn. Yemekten sonra', permissionTitle: 'Bildirim izni yok',
+      permissionMessage: 'Hatırlatıcı kaydedildi ancak bildirim izni verilmedi.',
+      dayLabels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+    },
+    profile: {
+      eyebrow: 'HESAP VE AYARLAR', fallbackName: 'Profilin', email: 'E-posta', fullName: 'Ad Soyad', language: 'Dil / Language',
+      saved: 'Kaydedildi', savedMessage: 'Profilin güncellendi.', notifications: 'Bildirimler',
+      notificationDesc: 'İlaç hatırlatıcıları ve haftalık test hakkı bildirimi', permissionRequired: 'İzin gerekli',
+      permissionInstructions: 'Bildirimlere izin verilmedi. Telefonun Ayarlar → AllergyGuard → Bildirimler bölümünden izin verebilirsin.',
+      free: 'Ücretsiz Plan', premium: '⭐ Premium Üye', unlimited: 'Sınırsız ilaç testi yapabilirsin.',
+      freeDesc: 'Haftada 1 ilaç testi hakkın var. Premium yakında!', signOut: 'Çıkış Yap', signOutQuestion: 'Hesabından çıkmak istiyor musun?',
+      deleteAccount: 'Hesabımı Kalıcı Olarak Sil', deleting: 'Hesap siliniyor...', deleteTitle: 'Hesabı Kalıcı Olarak Sil',
+      deleteWarning: 'Alerjilerin, analizlerin ve hatırlatıcıların kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+      deleteFailed: 'Hesap silinemedi. Lütfen tekrar dene.',
+    },
+    analysis: {
+      title: 'İlaç Analizi', ingredients: 'Etken Maddeler', compare: 'Alerjilerimle Karşılaştır', analyzing: 'Analiz ediliyor...',
+      matched: 'Eşleşen maddeler:', fallback: 'AI açıklaması kullanılamadı; doğrulanmış etken madde karşılaştırması gösterildi.',
+      addAllergy: 'Bu İlacı Alerji Listeme Ekle', inList: 'Alerji listende', disclaimer: 'Bu sonuç tıbbi tavsiye değildir. İlaç kullanmadan önce doktoruna veya eczacına danış.',
+      safe: 'Doğrudan Eşleşme Bulunmadı', warning: 'Dikkatli Ol', danger: 'Riskli', already: 'Zaten kayıtlı',
+      alreadyMessage: 'Bu ilaç alerji listende zaten var.', failed: 'Analiz başarısız oldu. Bağlantını kontrol edip tekrar dene.',
+      weeklyLimit: 'Bu haftaki ücretsiz test hakkın doldu. Pazartesi yenilenir.',
+      matchNote: 'Risk analizinde eşleşti: %{ingredients}', resultNote: 'Risk analizi sonucu eklendi',
+      added: 'Eklendi ✅', addedMessage: '“%{name}” alerji listene kaydedildi.',
+    },
+    scan: {
+      title: 'Barkod Tara', permission: 'Barkod okumak için kamera izni gerekiyor.', allow: 'Kameraya İzin Ver', querying: 'Barkod sorgulanıyor...',
+      hint: 'İlaç kutusundaki çizgili barkodu kameraya göster', notFound: 'Barkod bulunamadı', retry: 'Tekrar Tara',
+      test: 'Riski Test Et', add: 'Alerjilerime Ekle', rescan: 'Tekrar tara',
+      notFoundMessage: '%{barcode} — TİTCK listesinde bulunamadı. İsimle aramayı deneyebilirsin.',
+    },
+  },
+  en: {
+    common: {
+      error: 'Error', cancel: 'Cancel', delete: 'Delete', save: 'Save', add: 'Add', email: 'Email', password: 'Password',
+      optional: 'optional', retry: 'Try Again', loading: 'Loading...', ok: 'OK', unknown: 'Unknown', mild: 'Mild', moderate: 'Moderate', severe: 'Severe',
+    },
+    tabs: { allergies: 'My Allergies', test: 'Drug Check', reminders: 'Reminders', profile: 'Profile' },
+    auth: {
+      login: {
+        eyebrow: 'YOUR HEALTH, IN CONTROL', subtitle: 'Know your allergies and check medicines with more confidence.',
+        personalCheck: 'Personal allergy checks', barcode: 'Fast barcode scanning', remember: 'Remember me', forgot: 'Forgot password?',
+        submit: 'Sign In', noAccount: "Don't have an account?", register: 'Create one', missing: 'Enter your email and password.', failed: 'Sign in failed',
+      },
+      register: {
+        title: 'Create Account', subtitle: 'Start building your allergy list', name: 'Full Name', namePlaceholder: 'Your name',
+        passwordHint: 'At least 6 characters', submit: 'Create Account', hasAccount: 'Already have an account?', login: 'Sign in',
+        missing: 'Complete all fields.', weak: 'Password must be at least 6 characters.', checkEmail: 'Check your email',
+        confirmEmail: 'Open the confirmation link in your email, then sign in.',
+      },
+      forgot: {
+        title: 'Reset Password', subtitle: 'Enter your account email and we will send you a 6-digit verification code.', submit: 'Send Code',
+        back: 'Back to sign in', missing: 'Enter your email address.', sent: 'Code sent', sentMessage: 'A 6-digit verification code was sent to your email. (Check spam too.)',
+      },
+      reset: {
+        navTitle: 'New Password', title: 'Set a new password', subtitle: 'Enter the 6-digit code from your email and your new password.', invalid: 'Code is invalid or expired',
+        request: 'Request a new code', newPassword: 'New password', repeat: 'Repeat new password', repeatPlaceholder: 'Type your password again',
+        update: 'Update Password', verifying: 'Verifying link...', mismatchTitle: 'Passwords do not match', mismatch: 'Enter the same password in both fields.',
+        updated: 'Password updated', updatedMessage: 'You can now sign in with your new password.',
+        missingSession: 'Password reset session was not found.', linkFailed: 'The link could not be verified.',
+        code: 'Verification code', codePlaceholder: '6-digit code', codeMissing: 'Enter the 6-digit code from your email.',
+      },
+    },
+    allergies: {
+      greeting: 'HELLO', hero: 'Safer choices, calmer days.', active_one: '1 allergy record is actively protected.', active_other: '%{count} allergy records are actively protected.',
+      start: 'Add your first allergy to start your protection.', protection: 'Protection active', quick: 'QUICK ACTIONS', today: 'What would you like to do?',
+      test: 'Check a drug', risk: 'See the risk', scan: 'Scan barcode', find: 'Find quickly', remind: 'Remind me', setTime: 'Set a time',
+      records: 'Your allergy records', pendingIngredient: 'Ingredient information pending', ingredientCount_one: '1 ingredient saved',
+      ingredientCount_other: '%{count} ingredients saved', emptyTitle: 'No allergies yet', emptyText: 'Add medicines you are allergic to so new drugs can be compared against them.',
+      deleteTitle: 'Delete Allergy', deleteMessage: 'Remove “%{name}” from your list?', loadError: 'Could not load allergies: %{message}',
+      addTitle: 'Add Allergy', editTitle: 'Edit Allergy', scanAdd: 'Add with Barcode', drugName: 'Drug name *', drugPlaceholder: 'e.g. Aspirin',
+      reactionSeverity: 'Reaction severity', reactionNotes: 'Reaction notes', reactionPlaceholder: 'e.g. shortness of breath, rash...', selectedIngredient: 'Ingredient: %{ingredients}',
+    },
+    drugTest: {
+      eyebrow: 'SMART DRUG CHECK', title: 'Check your medicine', subtitle: 'Compare its ingredients with your allergy list.', premium: '⭐ Premium — unlimited checks',
+      quota: '%{left}/1 check remaining this week', quotaFull: 'Weekly check used — renews Monday', placeholder: 'Type a drug name (e.g. ibuprofen)',
+      search: 'Search', scan: 'Scan barcode', minChars: 'Enter at least 2 characters.', searchFailed: 'Search failed. Check your connection and try again.',
+      ingredient: 'Ingredient: %{ingredients}', analyze: 'Analyze risk →', noResult: 'No results. Try searching by active ingredient.',
+      empty: 'You have 1 free check per week. Try an active ingredient if a brand is not found.',
+    },
+    reminders: {
+      eyebrow: 'YOUR DAILY ROUTINE', title: 'Reminders', subtitle: 'Stay on top of your medicine schedule.', emptyTitle: 'No reminders yet',
+      emptyText: 'Add medicine times and receive an alert even without internet.', everyday: 'Every day', weekdays: 'Weekdays',
+      deleteTitle: 'Delete Reminder', deleteMessage: 'Delete the “%{name}” reminder?', addTitle: 'Add Reminder', editTitle: 'Edit Reminder',
+      time: 'Time', days: 'Days', notes: 'Note (optional)', notesPlaceholder: 'e.g. After a meal', permissionTitle: 'Notifications are off',
+      permissionMessage: 'The reminder was saved, but notifications are not permitted.', dayLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    },
+    profile: {
+      eyebrow: 'ACCOUNT & SETTINGS', fallbackName: 'Your Profile', email: 'Email', fullName: 'Full Name', language: 'Language / Dil',
+      saved: 'Saved', savedMessage: 'Your profile was updated.', notifications: 'Notifications', notificationDesc: 'Medicine reminders and weekly check alerts',
+      permissionRequired: 'Permission required', permissionInstructions: 'Notifications are not allowed. You can enable them in Settings → AllergyGuard → Notifications.',
+      free: 'Free Plan', premium: '⭐ Premium Member', unlimited: 'You have unlimited drug checks.',
+      freeDesc: 'You have 1 drug check per week. Premium is coming soon!', signOut: 'Sign Out', signOutQuestion: 'Do you want to sign out?',
+      deleteAccount: 'Permanently Delete My Account', deleting: 'Deleting account...', deleteTitle: 'Permanently Delete Account',
+      deleteWarning: 'Your allergies, analyses, and reminders will be permanently deleted. This cannot be undone.', deleteFailed: 'Could not delete the account. Please try again.',
+    },
+    analysis: {
+      title: 'Drug Analysis', ingredients: 'Active Ingredients', compare: 'Compare with My Allergies', analyzing: 'Analyzing...', matched: 'Matched ingredients:',
+      fallback: 'AI explanation was unavailable; verified ingredient comparison is shown.', addAllergy: 'Add This Drug to My Allergy List', inList: 'In your allergy list',
+      disclaimer: 'This result is not medical advice. Consult your doctor or pharmacist before using medicine.', safe: 'No Direct Match Found', warning: 'Use Caution', danger: 'Risk Detected',
+      already: 'Already saved', alreadyMessage: 'This drug is already in your allergy list.', failed: 'Analysis failed. Check your connection and try again.',
+      weeklyLimit: 'Your free weekly check is used. It renews on Monday.',
+      matchNote: 'Matched during risk analysis: %{ingredients}', resultNote: 'Added from a risk analysis',
+      added: 'Added ✅', addedMessage: '“%{name}” was saved to your allergy list.',
+    },
+    scan: {
+      title: 'Scan Barcode', permission: 'Camera access is required to scan a barcode.', allow: 'Allow Camera', querying: 'Looking up barcode...',
+      hint: 'Point the camera at the barcode on the medicine box', notFound: 'Barcode not found', retry: 'Scan Again', test: 'Check Risk',
+      add: 'Add to My Allergies', rescan: 'Scan again', notFoundMessage: '%{barcode} — Not found in the medicine list. Try searching by name.',
+    },
+  },
+});
+
+i18n.enableFallback = true;
+i18n.defaultLocale = 'tr';
