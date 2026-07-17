@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -12,8 +12,9 @@ export const styles = StyleSheet.create({
   },
   introCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16,
-    borderRadius: Radius.large, backgroundColor: Palette.accentSoft,
+    borderRadius: Radius.xlarge, backgroundColor: Palette.accentSoft,
     borderWidth: 1, borderColor: Palette.premiumBorder, marginBottom: 20,
+    boxShadow: Shadows.soft,
   },
   introIcon: {
     width: 48, height: 48, borderRadius: 16, alignItems: 'center',
@@ -48,6 +49,7 @@ export const styles = StyleSheet.create({
   dayChipSelected: {
     backgroundColor: PRIMARY,
     borderColor: PRIMARY,
+    boxShadow: Shadows.soft,
   },
   dayText: {
     fontSize: 13,
@@ -68,5 +70,4 @@ export const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
-
 

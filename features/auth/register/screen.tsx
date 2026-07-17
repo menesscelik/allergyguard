@@ -14,9 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PrimaryButton } from '@/components/form';
 import { useLocalization } from '@/lib/localization-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 
 export default function RegisterScreen() {
   const { t } = useLocalization();
+  const layout = useResponsiveLayout();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,13 +57,20 @@ export default function RegisterScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
-          contentContainerStyle={styles.container}
+          contentContainerStyle={[
+            styles.container,
+            {
+              paddingHorizontal: layout.pagePadding,
+              paddingVertical: layout.isShort ? 18 : 28,
+              justifyContent: layout.isShort ? 'flex-start' : 'center',
+            },
+          ]}
           keyboardShouldPersistTaps="handled">
-          <View style={styles.iconBadge}><Text style={styles.icon}>🛡️</Text></View>
-          <Text style={styles.title}>{t('auth.register.title')}</Text>
+          <View style={[styles.iconBadge, { width: layout.badgeSize, height: layout.badgeSize }]}><Text style={styles.icon}>🛡️</Text></View>
+          <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('auth.register.title')}</Text>
           <Text style={styles.subtitle}>{t('auth.register.subtitle')}</Text>
 
-          <View style={styles.formCard}>
+          <View style={[styles.formCard, layout.centerContent, { padding: layout.heroPadding }]}>
             <FormInput
               label={t('auth.register.name')}
               value={fullName}

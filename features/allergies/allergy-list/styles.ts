@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -12,16 +12,16 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 14,
+    paddingTop: 10,
     paddingBottom: 20,
-    marginHorizontal: 16,
-    marginBottom: 8,
+    marginHorizontal: 0,
+    marginBottom: 6,
     backgroundColor: Palette.primary,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     borderWidth: 1,
     borderColor: Palette.primary,
     overflow: 'hidden',
-    boxShadow: '0 12px 30px rgba(11, 129, 120, 0.24)',
+    boxShadow: Shadows.hero,
   },
   heroCopy: {
     flex: 1,
@@ -51,7 +51,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,
-    boxShadow: '0 8px 20px rgba(11, 129, 120, 0.18)',
+    boxShadow: Shadows.soft,
   },
   shieldEmoji: {
     fontSize: 30,
@@ -79,8 +79,8 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
   },
   sectionHeading: {
-    paddingHorizontal: 20,
-    marginTop: 8,
+    paddingHorizontal: 0,
+    marginTop: 4,
     marginBottom: 10,
   },
   sectionEyebrow: {
@@ -98,18 +98,58 @@ export const styles = StyleSheet.create({
   quickGrid: {
     flexDirection: 'row',
     gap: 9,
-    paddingHorizontal: 20,
     marginBottom: 20,
+  },
+  todayPanel: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  todayItem: {
+    flex: 1,
+    padding: 12,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    boxShadow: Shadows.soft,
+  },
+  todayItemDanger: {
+    flex: 1,
+    padding: 12,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.dangerSoft,
+    borderWidth: 1,
+    borderColor: Palette.danger,
+    boxShadow: Shadows.soft,
+  },
+  todayValue: {
+    color: Palette.primary,
+    fontSize: 22,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  todayValueDanger: {
+    color: Palette.danger,
+    fontSize: 22,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  todayLabel: {
+    color: Palette.textSecondary,
+    fontSize: 10,
+    fontWeight: '800',
+    marginTop: 2,
   },
   quickAction: {
     flex: 1,
     minHeight: 118,
     padding: 12,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     backgroundColor: Palette.surface,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: '0 6px 16px rgba(19, 46, 50, 0.06)',
+    boxShadow: Shadows.soft,
   },
   quickActionPrimary: {
     backgroundColor: Palette.accent,
@@ -151,7 +191,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
     marginBottom: 10,
   },
   listTitle: {
@@ -174,7 +213,7 @@ export const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   list: {
-    paddingHorizontal: 20,
+    paddingTop: 4,
     paddingBottom: 100,
     flexGrow: 1,
   },
@@ -182,12 +221,12 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Palette.surface,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: '0 4px 14px rgba(19, 46, 50, 0.05)',
+    boxShadow: Shadows.soft,
     overflow: 'hidden',
   },
   cardPressed: {
@@ -280,8 +319,6 @@ export const styles = StyleSheet.create({
     backgroundColor: PRIMARY,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 5px 16px rgba(11, 129, 120, 0.34)',
+    boxShadow: Shadows.hero,
   },
 });
-
-

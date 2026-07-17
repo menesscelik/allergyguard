@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Palette.background },
@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 22,
-    backgroundColor: Palette.primarySoft,
+    backgroundColor: Palette.primary,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
   title: {
     color: Palette.text,
     fontSize: 27,
-    fontWeight: '800',
+    fontWeight: '900',
     textAlign: 'center',
     marginTop: 18,
   },
@@ -31,11 +31,11 @@ export const styles = StyleSheet.create({
   },
   card: {
     padding: 20,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     backgroundColor: Palette.surface,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: '0 12px 32px rgba(23, 32, 51, 0.08)',
+    boxShadow: Shadows.card,
   },
   errorCard: {
     padding: 20,
@@ -47,5 +47,4 @@ export const styles = StyleSheet.create({
   errorTitle: { color: Palette.danger, fontSize: 16, fontWeight: '800' },
   errorText: { color: Palette.textSecondary, fontSize: 13, lineHeight: 19, marginTop: 6 },
 });
-
 

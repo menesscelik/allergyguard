@@ -12,15 +12,18 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 import type { DrugSearchResult } from '@/lib/types';
 
 export default function DrugTestScreen() {
   const { session } = useAuth();
   const { t } = useLocalization();
+  const layout = useResponsiveLayout();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<DrugSearchResult[] | null>(null);
@@ -80,13 +83,13 @@ export default function DrugTestScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
+      <View style={[styles.header, { marginHorizontal: layout.pagePadding, padding: layout.heroPadding }]}>
         <View style={styles.headerTop}>
           <View style={styles.headerCopy}>
             <Text style={styles.eyebrow}>{t('drugTest.eyebrow')}</Text>
-            <Text style={styles.title}>{t('drugTest.title')}</Text>
+            <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('drugTest.title')}</Text>
           </View>
-          <View style={styles.labBadge}>
+          <View style={[styles.labBadge, { width: layout.badgeSize, height: layout.badgeSize }]}>
             <Text style={styles.labEmoji}>🧪</Text>
           </View>
         </View>
@@ -94,8 +97,8 @@ export default function DrugTestScreen() {
         {quotaText && <Text style={styles.quota}>{quotaText}</Text>}
       </View>
 
-      <View style={styles.searchCard}>
-        <View style={styles.searchRow}>
+      <View style={[styles.searchCard, { margin: layout.pagePadding, padding: layout.isCompact ? 12 : 14 }]}>
+        <View style={[styles.searchRow, { flexDirection: layout.isCompact ? 'column' : 'row' }]}>
           <TextInput
             style={styles.input}
             value={query}
@@ -125,18 +128,20 @@ export default function DrugTestScreen() {
       <FlatList
         data={results ?? []}
         keyExtractor={(item, i) => item.rxcui ?? `${item.name}-${i}`}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingHorizontal: layout.pagePadding }]}
         keyboardShouldPersistTaps="handled"
-        renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => openResult(item)}>
-            <Text style={styles.drugName}>{item.name}</Text>
-            {item.ingredients.length > 0 && (
-              <Text style={styles.ingredients} numberOfLines={2}>
-                {t('drugTest.ingredient', { ingredients: item.ingredients.join(', ') })}
-              </Text>
-            )}
-            <Text style={styles.testLink}>{t('drugTest.analyze')}</Text>
-          </Pressable>
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.duration(220).delay(Math.min(index, 8) * 35)}>
+            <Pressable style={styles.card} onPress={() => openResult(item)}>
+              <Text style={styles.drugName}>{item.name}</Text>
+              {item.ingredients.length > 0 && (
+                <Text style={styles.ingredients} numberOfLines={2}>
+                  {t('drugTest.ingredient', { ingredients: item.ingredients.join(', ') })}
+                </Text>
+              )}
+              <Text style={styles.testLink}>{t('drugTest.analyze')}</Text>
+            </Pressable>
+          </Animated.View>
         )}
         ListEmptyComponent={
           results !== null && !loading ? (

@@ -17,6 +17,7 @@ import { FormInput, PrimaryButton } from '@/components/form';
 import { useAuth } from '@/lib/auth-context';
 import type { TrDrugSuggestion } from '@/lib/drugs';
 import { useLocalization } from '@/lib/localization-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 import { SEVERITY_COLORS, type Severity } from '@/lib/types';
 
 const SEVERITIES: Severity[] = ['mild', 'moderate', 'severe', 'unknown'];
@@ -24,6 +25,7 @@ const SEVERITIES: Severity[] = ['mild', 'moderate', 'severe', 'unknown'];
 export default function AddAllergyScreen() {
   const { session } = useAuth();
   const { t } = useLocalization();
+  const layout = useResponsiveLayout();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const isEdit = !!id;
 
@@ -104,8 +106,14 @@ export default function AddAllergyScreen() {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.introCard}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },
+          ]}
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardShouldPersistTaps="handled">
+          <View style={[styles.introCard, layout.centerContent, { padding: layout.heroPadding }]}>
             <View style={styles.introIcon}><Text style={styles.introEmoji}>🛡️</Text></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.introTitle}>
@@ -115,22 +123,24 @@ export default function AddAllergyScreen() {
             </View>
           </View>
           {!isEdit && (
-            <Pressable style={styles.scanButton} onPress={() => router.replace('/scan')}>
+            <Pressable style={[styles.scanButton, layout.centerContent]} onPress={() => router.replace('/scan')}>
               <Text style={styles.scanButtonText}>📷 {t('allergies.scanAdd')}</Text>
             </Pressable>
           )}
 
-          <FormInput
-            label={t('allergies.drugName')}
-            value={drugName}
-            onChangeText={onChangeDrugName}
-            placeholder={t('allergies.drugPlaceholder')}
-            autoFocus={!isEdit}
-            autoCorrect={false}
-          />
+          <View style={layout.centerContent}>
+            <FormInput
+              label={t('allergies.drugName')}
+              value={drugName}
+              onChangeText={onChangeDrugName}
+              placeholder={t('allergies.drugPlaceholder')}
+              autoFocus={!isEdit}
+              autoCorrect={false}
+            />
+          </View>
 
           {suggestions.length > 0 && (
-            <View style={styles.suggestions}>
+            <View style={[styles.suggestions, layout.centerContent]}>
               {suggestions.map((s) => (
                 <Pressable
                   key={s.barcode ?? s.name}
@@ -155,8 +165,10 @@ export default function AddAllergyScreen() {
             </Text>
           )}
 
-          <Text style={styles.label}>{t('allergies.reactionSeverity')}</Text>
-          <View style={styles.chips}>
+          <View style={layout.centerContent}>
+            <Text style={styles.label}>{t('allergies.reactionSeverity')}</Text>
+          </View>
+          <View style={[styles.chips, layout.centerContent]}>
             {SEVERITIES.map((s) => {
               const selected = severity === s;
               return (
@@ -175,21 +187,25 @@ export default function AddAllergyScreen() {
             })}
           </View>
 
-          <FormInput
-            label={t('allergies.reactionNotes')}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder={t('allergies.reactionPlaceholder')}
-            multiline
-            numberOfLines={3}
-            style={styles.notesInput}
-          />
+          <View style={layout.centerContent}>
+            <FormInput
+              label={t('allergies.reactionNotes')}
+              value={notes}
+              onChangeText={setNotes}
+              placeholder={t('allergies.reactionPlaceholder')}
+              multiline
+              numberOfLines={3}
+              style={styles.notesInput}
+            />
+          </View>
 
-          <PrimaryButton
-            title={isEdit ? t('common.save') : t('common.add')}
-            onPress={handleSave}
-            loading={saving}
-          />
+          <View style={layout.centerContent}>
+            <PrimaryButton
+              title={isEdit ? t('common.save') : t('common.add')}
+              onPress={handleSave}
+              loading={saving}
+            />
+          </View>
 
         </ScrollView>
       </KeyboardAvoidingView>

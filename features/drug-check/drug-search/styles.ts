@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -9,10 +9,11 @@ export const styles = StyleSheet.create({
   },
   header: {
     marginHorizontal: 16,
-    marginTop: 14,
+    marginTop: 4,
     padding: 20,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     backgroundColor: Palette.primary,
+    boxShadow: Shadows.hero,
   },
   headerTop: {
     flexDirection: 'row',
@@ -65,11 +66,11 @@ export const styles = StyleSheet.create({
   searchCard: {
     margin: 16,
     padding: 14,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     backgroundColor: Palette.surface,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: '0 8px 24px rgba(19, 46, 50, 0.07)',
+    boxShadow: Shadows.card,
   },
   searchRow: {
     flexDirection: 'row',
@@ -78,8 +79,8 @@ export const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: Palette.borderStrong,
-    borderRadius: Radius.medium,
+    borderColor: Palette.border,
+    borderRadius: Radius.large,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,
@@ -88,7 +89,7 @@ export const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: PRIMARY,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     paddingHorizontal: 18,
     justifyContent: 'center',
   },
@@ -101,7 +102,7 @@ export const styles = StyleSheet.create({
     marginTop: 10,
     borderWidth: 1.5,
     borderColor: PRIMARY,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     paddingVertical: 12,
     alignItems: 'center',
     backgroundColor: Palette.primarySoft,
@@ -123,7 +124,8 @@ export const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: Palette.surface,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
+    boxShadow: Shadows.soft,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
@@ -163,5 +165,3 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
-
-

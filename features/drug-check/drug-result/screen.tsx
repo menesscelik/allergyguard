@@ -8,11 +8,13 @@ import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { PrimaryButton } from '@/components/form';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 import { RISK_META, type AnalysisResult } from '@/lib/types';
 
 export default function DrugResultScreen() {
   const { session } = useAuth();
   const { t, language } = useLocalization();
+  const layout = useResponsiveLayout();
   const params = useLocalSearchParams<{ name: string; rxcui?: string; ingredients?: string }>();
   const drugName = params.name ?? '';
   const ingredients: string[] = params.ingredients ? JSON.parse(params.ingredients) : [];
@@ -84,20 +86,27 @@ export default function DrugResultScreen() {
   }
 
   const meta = result ? RISK_META[result.risk_level] : null;
+  const riskScore = result?.risk_level === 'danger' ? 92 : result?.risk_level === 'warning' ? 56 : 18;
 
   return (
     <>
       <Stack.Screen options={{ title: t('analysis.title') }} />
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View style={styles.drugHero}>
-          <View style={styles.drugBadge}><Text style={styles.drugEmoji}>💊</Text></View>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.content,
+          { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },
+        ]}
+        contentInsetAdjustmentBehavior="automatic">
+        <View style={[styles.drugHero, layout.centerContent, { padding: layout.heroPadding }]}>
+          <View style={[styles.drugBadge, { width: layout.badgeSize, height: layout.badgeSize }]}><Text style={styles.drugEmoji}>💊</Text></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.heroEyebrow}>{t('analysis.title').toLocaleUpperCase(language)}</Text>
-            <Text style={styles.drugName}>{drugName}</Text>
+            <Text style={[styles.drugName, { fontSize: layout.titleSize }]}>{drugName}</Text>
           </View>
         </View>
         {ingredients.length > 0 && (
-          <View style={styles.section}>
+          <View style={[styles.section, layout.centerContent]}>
             <Text style={styles.sectionTitle}>{t('analysis.ingredients')}</Text>
             {ingredients.map((ing) => (
               <Text key={ing} style={styles.ingredient}>
@@ -119,41 +128,82 @@ export default function DrugResultScreen() {
         )}
 
         {result && meta && (
-          <View style={[styles.resultCard, { backgroundColor: meta.bg, borderColor: meta.color }]}>
-            <Text style={[styles.riskTitle, { color: meta.color }]}>
-              {meta.emoji} {t(`analysis.${result.risk_level}`)}
-            </Text>
-
-            {result.matched_ingredients.length > 0 && (
-              <View style={styles.matchedBox}>
-                <Text style={[styles.matchedTitle, { color: meta.color }]}>{t('analysis.matched')}</Text>
-                {result.matched_ingredients.map((m) => (
-                  <Text key={m} style={[styles.matchedItem, { color: meta.color }]}>
-                    • {m}
-                  </Text>
-                ))}
-              </View>
-            )}
-
-            <Text style={styles.explanation}>{result.explanation}</Text>
-            <Text style={styles.recommendation}>👉 {result.recommendation}</Text>
-
-            {!!result.evidence_sources?.length && (
-              <View style={styles.evidenceRow}>
-                {result.evidence_sources.map((source) => (
-                  <View key={source} style={styles.evidenceChip}>
-                    <Text style={styles.evidenceText}>✓ {source}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {result.used_fallback && (
-              <Text style={styles.fallbackNote}>
-                {t('analysis.fallback')}
+          <>
+            <View style={[styles.resultHero, layout.centerContent, { backgroundColor: meta.bg, borderColor: meta.color }]}>
+              <Text style={styles.resultEmoji}>{meta.emoji}</Text>
+              <Text style={[styles.riskTitle, { color: meta.color }]}>
+                {t(`analysis.${result.risk_level}`)}
               </Text>
+              <View style={[styles.scoreRing, { borderColor: meta.color }]}>
+                <Text style={[styles.scoreValue, { color: meta.color }]}>{riskScore}</Text>
+                <Text style={styles.scoreLabel}>{t('analysis.riskScore')}</Text>
+              </View>
+              <Text style={styles.resultSummary}>
+                {result.risk_level === 'danger'
+                  ? t('analysis.summaryDanger')
+                  : result.risk_level === 'warning'
+                    ? t('analysis.summaryWarning')
+                    : t('analysis.summarySafe')}
+              </Text>
+            </View>
+
+            {result.severity_alert === 'severe' && (
+              <View style={[styles.severityAlertCard, layout.centerContent]}>
+                <Text style={styles.severityAlertTitle}>{t('analysis.severeAlertTitle')}</Text>
+                <Text style={styles.severityAlertText}>{t('analysis.severeAlertText')}</Text>
+              </View>
             )}
-          </View>
+
+            <View style={[styles.detailCard, layout.centerContent]}>
+              <Text style={styles.detailTitle}>{t('analysis.whatChecked')}</Text>
+              {(result.tested_ingredients.length > 0 ? result.tested_ingredients : ingredients).map((ing) => (
+                <Text key={ing} style={styles.detailLine}>• {ing}</Text>
+              ))}
+              {result.tested_ingredients.length === 0 && ingredients.length === 0 && (
+                <Text style={styles.muted}>{t('history.noIngredients')}</Text>
+              )}
+            </View>
+
+            <View style={[styles.detailCard, layout.centerContent]}>
+              <Text style={styles.detailTitle}>{t('analysis.matchDetails')}</Text>
+              {result.matched_ingredients.length > 0 ? (
+                result.matched_ingredients.map((m) => (
+                  <View key={m} style={[styles.matchedChip, { backgroundColor: meta.bg }]}>
+                    <Text style={[styles.matchedItem, { color: meta.color }]}>✓ {m}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.muted}>{t('analysis.noMatchedDetail')}</Text>
+              )}
+            </View>
+
+            <View style={[styles.detailCard, layout.centerContent]}>
+              <Text style={styles.detailTitle}>{t('analysis.explanationTitle')}</Text>
+              <Text style={styles.explanation}>{result.explanation}</Text>
+            </View>
+
+            <View style={[styles.recommendationCard, layout.centerContent, { borderColor: meta.color }]}>
+              <Text style={styles.detailTitle}>👉 {t('analysis.recommendationTitle')}</Text>
+              <Text style={styles.recommendation}>{result.recommendation}</Text>
+            </View>
+
+            <View style={[styles.methodCard, layout.centerContent]}>
+              <Text style={styles.methodTitle}>{t('analysis.howItWorks')}</Text>
+              <Text style={styles.methodText}>{t('analysis.stepIngredients')}</Text>
+              <Text style={styles.methodText}>{t('analysis.stepCompare')}</Text>
+              <Text style={styles.methodText}>{t('analysis.stepExplain')}</Text>
+              {!!result.evidence_sources?.length && (
+                <View style={styles.evidenceRow}>
+                  {result.evidence_sources.map((source) => (
+                    <View key={source} style={styles.evidenceChip}>
+                      <Text style={styles.evidenceText}>✓ {source}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+              {result.used_fallback && <Text style={styles.fallbackNote}>{t('analysis.fallback')}</Text>}
+            </View>
+          </>
         )}
 
         {result && result.risk_level !== 'safe' && (

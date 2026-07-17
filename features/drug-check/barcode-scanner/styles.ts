@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -12,11 +12,12 @@ export const styles = StyleSheet.create({
   },
   panel: {
     backgroundColor: Palette.surface,
-    borderTopLeftRadius: Radius.large,
-    borderTopRightRadius: Radius.large,
+    borderTopLeftRadius: Radius.xlarge,
+    borderTopRightRadius: Radius.xlarge,
     padding: 20,
     paddingBottom: 36,
     gap: 10,
+    boxShadow: '0 -16px 36px rgba(0, 0, 0, 0.18)',
   },
   center: {
     flex: 1,
@@ -60,7 +61,7 @@ export const styles = StyleSheet.create({
   secondaryButton: {
     borderWidth: 1.5,
     borderColor: PRIMARY,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     paddingVertical: 13,
     alignItems: 'center',
   },
@@ -76,5 +77,4 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-
 

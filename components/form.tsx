@@ -8,7 +8,7 @@ import {
   type TextInputProps,
 } from 'react-native';
 
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 
 export const PRIMARY = Palette.primary;
 
@@ -67,20 +67,22 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: Palette.borderStrong,
-    borderRadius: Radius.medium,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderColor: Palette.border,
+    borderRadius: Radius.large,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
     color: Palette.text,
     backgroundColor: Palette.surface,
+    boxShadow: Shadows.soft,
   },
   button: {
-    backgroundColor: PRIMARY,
-    borderRadius: Radius.medium,
-    paddingVertical: 14,
+    backgroundColor: Palette.primary,
+    borderRadius: Radius.large,
+    paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
+    boxShadow: Shadows.hero,
   },
   buttonDim: {
     opacity: 0.6,
@@ -88,6 +90,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Palette.white,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '900',
   },
 });

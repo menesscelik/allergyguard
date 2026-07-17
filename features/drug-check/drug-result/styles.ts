@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -12,8 +12,9 @@ export const styles = StyleSheet.create({
   },
   drugHero: {
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18,
-    borderRadius: Radius.large, backgroundColor: Palette.accentSoft,
+    borderRadius: Radius.xlarge, backgroundColor: Palette.accentSoft,
     borderWidth: 1, borderColor: Palette.premiumBorder, marginBottom: 20,
+    boxShadow: Shadows.soft,
   },
   drugBadge: {
     width: 50, height: 50, borderRadius: 17, alignItems: 'center',
@@ -48,27 +49,104 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     textAlign: 'center',
   },
-  resultCard: {
+  resultHero: {
     borderWidth: 1,
-    borderRadius: Radius.medium,
-    padding: 18,
+    borderRadius: Radius.xlarge,
+    padding: 20,
     marginTop: 8,
+    alignItems: 'center',
+  },
+  resultEmoji: {
+    fontSize: 38,
   },
   riskTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 10,
+    fontSize: 22,
+    fontWeight: '900',
+    marginTop: 8,
   },
-  matchedBox: {
-    marginBottom: 10,
+  resultSummary: {
+    color: Palette.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    marginTop: 6,
   },
-  matchedTitle: {
-    fontWeight: '700',
-    marginBottom: 4,
+  severityAlertCard: {
+    padding: 16,
+    borderRadius: Radius.xlarge,
+    backgroundColor: Palette.dangerSoft,
+    borderWidth: 1.5,
+    borderColor: Palette.danger,
+    marginTop: 12,
+    boxShadow: Shadows.danger,
+  },
+  severityAlertTitle: {
+    color: Palette.danger,
+    fontSize: 16,
+    fontWeight: '900',
+    marginBottom: 6,
+  },
+  severityAlertText: {
+    color: Palette.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  scoreRing: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    borderWidth: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Palette.surface,
+    marginTop: 12,
+  },
+  scoreValue: {
+    fontSize: 24,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  scoreLabel: {
+    color: Palette.textMuted,
+    fontSize: 10,
+    fontWeight: '900',
+    marginTop: -2,
+  },
+  detailCard: {
+    padding: 16,
+    borderRadius: Radius.xlarge,
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    boxShadow: Shadows.soft,
+    marginTop: 12,
+  },
+  detailTitle: {
+    color: Palette.text,
+    fontSize: 16,
+    fontWeight: '900',
+    marginBottom: 9,
+  },
+  detailLine: {
+    color: Palette.textSecondary,
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  muted: {
+    color: Palette.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  matchedChip: {
+    alignSelf: 'flex-start',
+    borderRadius: Radius.pill,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    marginBottom: 7,
   },
   matchedItem: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    fontWeight: '900',
   },
   explanation: {
     fontSize: 15,
@@ -77,10 +155,35 @@ export const styles = StyleSheet.create({
   },
   recommendation: {
     fontSize: 15,
-    fontWeight: '600',
-    color: Palette.text,
-    marginTop: 10,
+    color: Palette.textSecondary,
     lineHeight: 22,
+  },
+  recommendationCard: {
+    padding: 16,
+    borderRadius: Radius.xlarge,
+    backgroundColor: Palette.surface,
+    borderWidth: 1.5,
+    marginTop: 12,
+  },
+  methodCard: {
+    padding: 16,
+    borderRadius: Radius.xlarge,
+    backgroundColor: Palette.accentSoft,
+    borderWidth: 1,
+    borderColor: Palette.premiumBorder,
+    marginTop: 12,
+  },
+  methodTitle: {
+    color: Palette.accent,
+    fontSize: 15,
+    fontWeight: '900',
+    marginBottom: 8,
+  },
+  methodText: {
+    color: Palette.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 5,
   },
   evidenceRow: {
     flexDirection: 'row',
@@ -105,7 +208,7 @@ export const styles = StyleSheet.create({
   saveButton: {
     borderWidth: 1.5,
     borderColor: Palette.danger,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     paddingVertical: 13,
     alignItems: 'center',
     marginTop: 14,
@@ -130,5 +233,3 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-
-

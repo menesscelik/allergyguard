@@ -1,6 +1,6 @@
 import { styles } from './styles';
 import { getAuthPreferences, signIn } from './service';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -15,9 +15,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PrimaryButton } from '@/components/form';
 import { useLocalization } from '@/lib/localization-context';
+import { useOnboarding } from '@/lib/onboarding-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 
 export default function LoginScreen() {
   const { t } = useLocalization();
+  const onboarding = useOnboarding();
+  const layout = useResponsiveLayout();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
@@ -42,7 +46,8 @@ export default function LoginScreen() {
       Alert.alert(t('auth.login.failed'), error.message);
       return;
     }
-    // Başarılıysa yönlendirmeyi root layout'taki Stack.Protected yapar
+    await onboarding.complete();
+    router.replace('/(tabs)' as never);
   }
 
   return (
@@ -51,18 +56,25 @@ export default function LoginScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
-          contentContainerStyle={styles.container}
+          contentContainerStyle={[
+            styles.container,
+            {
+              paddingHorizontal: layout.pagePadding,
+              paddingVertical: layout.isShort ? 18 : 28,
+              justifyContent: layout.isShort ? 'flex-start' : 'center',
+            },
+          ]}
           keyboardShouldPersistTaps="handled">
           <View style={styles.glowTop} />
           <View style={styles.glowBottom} />
-          <View style={styles.logoWrap}>
+          <View style={[styles.logoWrap, { width: layout.badgeSize, height: layout.badgeSize }]}>
             <Text style={styles.logo}>✚</Text>
           </View>
           <Text style={styles.eyebrow}>{t('auth.login.eyebrow')}</Text>
-          <Text style={styles.title}>AllergyGuard</Text>
+          <Text style={[styles.title, { fontSize: layout.largeTitleSize }]}>AllergyGuard</Text>
           <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
 
-          <View style={styles.formCard}>
+          <View style={[styles.formCard, layout.centerContent, { padding: layout.heroPadding }]}>
             <View style={styles.trustRow}>
               <View style={styles.trustItem}>
                 <Text style={styles.trustIcon}>✓</Text>

@@ -52,6 +52,33 @@ export type Reminder = {
   created_at: string;
 };
 
+export type IntakeStatus = 'taken' | 'skipped';
+
+export type MedicationIntakeLog = {
+  id: string;
+  user_id: string;
+  reminder_id: string;
+  status: IntakeStatus;
+  taken_for_date: string;
+  note: string | null;
+  created_at: string;
+};
+
+export type DrugCheck = {
+  id: string;
+  user_id: string;
+  tested_drug_name: string;
+  tested_drug_name_en: string | null;
+  tested_ingredients: string[];
+  tested_ingredients_en: string[];
+  risk_level: RiskLevel;
+  matched_ingredients: string[];
+  ai_explanation: string | null;
+  ai_recommendation: string | null;
+  language: 'tr' | 'en';
+  created_at: string;
+};
+
 // index = gün - 1
 export const DAY_LABELS = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
 
@@ -66,6 +93,7 @@ export type RiskLevel = 'safe' | 'warning' | 'danger';
 export type AnalysisResult = {
   risk_level: RiskLevel;
   matched_ingredients: string[];
+  severity_alert?: Severity | null;
   explanation: string;
   recommendation: string;
   tested_drug_name: string;
@@ -73,6 +101,21 @@ export type AnalysisResult = {
   used_fallback: boolean;
   evidence_sources?: string[];
   analysis_method?: string;
+  remaining_checks?: number | null;
+};
+
+export type FeedbackType = 'drug_not_found' | 'wrong_info' | 'general';
+
+export type FeedbackReport = {
+  id: string;
+  user_id: string;
+  type: FeedbackType;
+  drug_name: string | null;
+  barcode: string | null;
+  message: string;
+  metadata: Record<string, unknown>;
+  status: string;
+  created_at: string;
 };
 
 export const RISK_META: Record<RiskLevel, { label: string; emoji: string; color: string; bg: string }> = {

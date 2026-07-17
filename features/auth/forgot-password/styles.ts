@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -10,13 +10,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconBadge: {
-    width: 60, height: 60, borderRadius: 20, alignSelf: 'center',
-    alignItems: 'center', justifyContent: 'center', backgroundColor: Palette.accentSoft,
+    width: 68, height: 68, borderRadius: 24, alignSelf: 'center',
+    alignItems: 'center', justifyContent: 'center', backgroundColor: Palette.accent,
+    boxShadow: Shadows.accent,
   },
   icon: { fontSize: 28 },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 31,
+    fontWeight: '900',
     textAlign: 'center',
     color: Palette.text,
   },
@@ -28,9 +29,9 @@ export const styles = StyleSheet.create({
     marginBottom: 24,
   },
   formCard: {
-    padding: 20, borderRadius: 22, backgroundColor: Palette.surface,
+    padding: 20, borderRadius: Radius.xlarge, backgroundColor: Palette.surface,
     borderWidth: 1, borderColor: Palette.border,
-    boxShadow: '0 12px 32px rgba(23, 32, 51, 0.08)',
+    boxShadow: Shadows.card,
   },
   link: {
     color: PRIMARY,
@@ -39,5 +40,4 @@ export const styles = StyleSheet.create({
     marginTop: 16,
   },
 });
-
 

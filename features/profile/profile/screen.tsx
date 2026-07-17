@@ -1,13 +1,14 @@
 import { styles } from './styles';
 import {
   deleteAccount,
+  getProfileStats,
   getProfile,
   notificationsEnabled,
   setNotificationsEnabled,
   signOut,
   updateProfile,
 } from './service';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,16 +16,25 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormInput, PRIMARY, PrimaryButton } from '@/components/form';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 import type { Profile } from '@/lib/types';
+
+type ProfileStats = {
+  allergyCount: number;
+  totalChecks: number;
+  riskyChecks: number;
+};
 
 export default function ProfileScreen() {
   const { session } = useAuth();
   const { t, language, setLanguage: changeLanguage } = useLocalization();
+  const layout = useResponsiveLayout();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [fullName, setFullName] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [notifsOn, setNotifsOn] = useState(true);
+  const [stats, setStats] = useState<ProfileStats>({ allergyCount: 0, totalChecks: 0, riskyChecks: 0 });
 
   useEffect(() => {
     notificationsEnabled().then(setNotifsOn);
@@ -52,6 +62,7 @@ export default function ProfileScreen() {
             setFullName(data.full_name ?? '');
           }
         });
+      getProfileStats().then(setStats).catch(() => {});
     }, [session])
   );
 
@@ -73,7 +84,14 @@ export default function ProfileScreen() {
       {
         text: t('profile.signOut'),
         style: 'destructive',
-        onPress: signOut,
+        onPress: async () => {
+          const { error } = await signOut();
+          if (error) {
+            Alert.alert(t('common.error'), error.message);
+            return;
+          }
+          router.replace('/(auth)/login' as never);
+        },
       },
     ]);
   }
@@ -103,9 +121,13 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.profileHero}>
-          <View style={styles.avatar}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },
+        ]}>
+        <View style={[styles.profileHero, layout.centerContent, { padding: layout.heroPadding }]}>
+          <View style={[styles.avatar, { width: layout.badgeSize, height: layout.badgeSize }]}>
             <Text style={styles.avatarText}>
               {(fullName || session?.user.email || 'A').slice(0, 1).toLocaleUpperCase('tr')}
             </Text>
@@ -117,20 +139,39 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
+        <View style={[styles.card, layout.centerContent]}>
           <Text style={styles.emailLabel}>{t('profile.email')}</Text>
           <Text style={styles.email}>{session?.user.email}</Text>
         </View>
 
-        <FormInput
-          label={t('profile.fullName')}
-          value={fullName}
-          onChangeText={setFullName}
-          placeholder={t('auth.register.namePlaceholder')}
-        />
+        <View style={[styles.statsRow, layout.centerContent]}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats.allergyCount}</Text>
+            <Text style={styles.statLabel}>{t('profile.statsAllergies')}</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats.totalChecks}</Text>
+            <Text style={styles.statLabel}>{t('profile.statsChecks')}</Text>
+          </View>
+          <View style={styles.statCardDanger}>
+            <Text style={styles.statValueDanger}>{stats.riskyChecks}</Text>
+            <Text style={styles.statLabel}>{t('profile.statsRisky')}</Text>
+          </View>
+        </View>
 
-        <Text style={styles.label}>{t('profile.language')}</Text>
-        <View style={styles.langRow}>
+        <View style={layout.centerContent}>
+          <FormInput
+            label={t('profile.fullName')}
+            value={fullName}
+            onChangeText={setFullName}
+            placeholder={t('auth.register.namePlaceholder')}
+          />
+        </View>
+
+        <View style={layout.centerContent}>
+          <Text style={styles.label}>{t('profile.language')}</Text>
+        </View>
+        <View style={[styles.langRow, layout.centerContent]}>
           {(['tr', 'en'] as const).map((lang) => {
             const selected = language === lang;
             return (
@@ -146,9 +187,11 @@ export default function ProfileScreen() {
           })}
         </View>
 
-        <PrimaryButton title={t('common.save')} onPress={handleSave} loading={saving} />
+        <View style={layout.centerContent}>
+          <PrimaryButton title={t('common.save')} onPress={handleSave} loading={saving} />
+        </View>
 
-        <View style={styles.settingRow}>
+        <View style={[styles.settingRow, layout.centerContent]}>
           <View style={{ flex: 1 }}>
             <Text style={styles.settingTitle}>{t('profile.notifications')}</Text>
             <Text style={styles.settingDesc}>{t('profile.notificationDesc')}</Text>
@@ -160,7 +203,27 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <View style={styles.premiumCard}>
+        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/settings' as never)}>
+          <Text style={styles.navTitle}>⚙️ {t('settings.title')}</Text>
+          <Text style={styles.navArrow}>›</Text>
+        </Pressable>
+
+        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/emergency-card' as never)}>
+          <Text style={styles.navTitle}>🆘 {t('emergency.title')}</Text>
+          <Text style={styles.navArrow}>›</Text>
+        </Pressable>
+
+        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/interaction-check' as never)}>
+          <Text style={styles.navTitle}>🔒 {t('interaction.title')}</Text>
+          <Text style={styles.navArrow}>›</Text>
+        </Pressable>
+
+        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/feedback' as never)}>
+          <Text style={styles.navTitle}>💬 {t('feedback.title')}</Text>
+          <Text style={styles.navArrow}>›</Text>
+        </Pressable>
+
+        <Pressable style={[styles.premiumCard, layout.centerContent]} onPress={() => router.push('/premium' as never)}>
           <Text style={styles.premiumTitle}>
             {profile?.is_premium ? t('profile.premium') : t('profile.free')}
           </Text>
@@ -169,7 +232,8 @@ export default function ProfileScreen() {
               ? t('profile.unlimited')
               : t('profile.freeDesc')}
           </Text>
-        </View>
+          <Text style={styles.premiumLink}>{t('premium.open')}</Text>
+        </Pressable>
 
         <Pressable onPress={handleSignOut} style={styles.signOut}>
           <Text style={styles.signOutText}>{t('profile.signOut')}</Text>

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -9,15 +9,16 @@ export const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingTop: 12,
   },
   profileHero: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Palette.primary,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     padding: 20,
     marginBottom: 20,
-    boxShadow: '0 10px 26px rgba(11, 129, 120, 0.22)',
+    boxShadow: Shadows.hero,
   },
   avatar: {
     width: 58,
@@ -55,12 +56,53 @@ export const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: Palette.surface,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: '0 4px 14px rgba(19, 46, 50, 0.05)',
+    boxShadow: Shadows.soft,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    padding: 13,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    boxShadow: Shadows.soft,
+  },
+  statCardDanger: {
+    flex: 1,
+    padding: 13,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.dangerSoft,
+    borderWidth: 1,
+    borderColor: Palette.danger,
+    boxShadow: Shadows.soft,
+  },
+  statValue: {
+    color: Palette.primary,
+    fontSize: 22,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  statValueDanger: {
+    color: Palette.danger,
+    fontSize: 22,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
+  statLabel: {
+    color: Palette.textSecondary,
+    fontSize: 10,
+    fontWeight: '800',
+    marginTop: 3,
   },
   emailLabel: {
     fontSize: 12,
@@ -107,11 +149,33 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Palette.surface,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     padding: 16,
     marginTop: 24,
     borderWidth: 1,
     borderColor: Palette.border,
+  },
+  navRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Palette.surface,
+    borderRadius: Radius.large,
+    padding: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    boxShadow: Shadows.soft,
+  },
+  navTitle: {
+    color: Palette.text,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  navArrow: {
+    color: Palette.textMuted,
+    fontSize: 26,
+    fontWeight: '600',
   },
   settingTitle: {
     fontSize: 15,
@@ -127,9 +191,10 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.premiumSoft,
     borderColor: Palette.premiumBorder,
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: Radius.large,
     padding: 16,
     marginTop: 24,
+    boxShadow: Shadows.soft,
   },
   premiumTitle: {
     fontSize: 16,
@@ -140,6 +205,12 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     color: Palette.premium,
     marginTop: 4,
+  },
+  premiumLink: {
+    color: Palette.premium,
+    fontSize: 13,
+    fontWeight: '900',
+    marginTop: 10,
   },
   signOut: {
     marginTop: 32,
@@ -164,5 +235,3 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-
-

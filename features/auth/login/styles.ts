@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
     height: 240,
     borderRadius: 120,
     backgroundColor: Palette.primarySoft,
+    opacity: 0.9,
     top: -100,
     right: -90,
   },
@@ -27,7 +28,8 @@ export const styles = StyleSheet.create({
     width: 180,
     height: 180,
     borderRadius: 90,
-    backgroundColor: Palette.accentSoft,
+    backgroundColor: Palette.coralSoft,
+    opacity: 0.9,
     bottom: -80,
     left: -80,
   },
@@ -39,7 +41,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Palette.primary,
-    boxShadow: '0 10px 26px rgba(11, 129, 120, 0.28)',
+    boxShadow: Shadows.hero,
   },
   logo: {
     fontSize: 34,
@@ -49,15 +51,15 @@ export const styles = StyleSheet.create({
   },
   eyebrow: {
     marginTop: 20,
-    color: Palette.primary,
+    color: Palette.accent,
     fontWeight: '800',
     fontSize: 11,
     letterSpacing: 1.5,
     textAlign: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 31,
+    fontWeight: '900',
     textAlign: 'center',
     color: Palette.text,
     marginTop: 6,
@@ -73,17 +75,17 @@ export const styles = StyleSheet.create({
   },
   formCard: {
     backgroundColor: Palette.surface,
-    borderRadius: 24,
+    borderRadius: Radius.xlarge,
     borderWidth: 1,
     borderColor: Palette.border,
     padding: 20,
-    boxShadow: '0 12px 32px rgba(19, 46, 50, 0.09)',
+    boxShadow: Shadows.card,
   },
   trustRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Palette.primarySoft,
-    borderRadius: Radius.medium,
+    backgroundColor: Palette.accentSoft,
+    borderRadius: Radius.large,
     padding: 11,
     marginBottom: 18,
   },
@@ -93,7 +95,7 @@ export const styles = StyleSheet.create({
     gap: 3,
   },
   trustIcon: {
-    color: Palette.primary,
+    color: Palette.accent,
     fontSize: 16,
     fontWeight: '800',
   },
@@ -166,5 +168,4 @@ export const styles = StyleSheet.create({
     color: Palette.textSecondary,
   },
 });
-
 

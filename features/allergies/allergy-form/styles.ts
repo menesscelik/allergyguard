@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -14,11 +14,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 14,
     padding: 16,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     backgroundColor: Palette.primarySoft,
     borderWidth: 1,
     borderColor: Palette.primaryBorder,
     marginBottom: 20,
+    boxShadow: Shadows.soft,
   },
   introIcon: {
     width: 48,
@@ -34,7 +35,7 @@ export const styles = StyleSheet.create({
   scanButton: {
     borderWidth: 1.5,
     borderColor: Palette.primary,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 20,
@@ -53,8 +54,9 @@ export const styles = StyleSheet.create({
   suggestions: {
     borderWidth: 1,
     borderColor: Palette.border,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     backgroundColor: Palette.surface,
+    boxShadow: Shadows.soft,
     marginTop: -8,
     marginBottom: 16,
     overflow: 'hidden',
@@ -108,5 +110,4 @@ export const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 });
-
 

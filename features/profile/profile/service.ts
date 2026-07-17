@@ -9,6 +9,20 @@ export async function getProfile(userId: string) {
   return { ...result, data: result.data as Profile | null };
 }
 
+export async function getProfileStats() {
+  const [allergies, checks, risky] = await Promise.all([
+    supabase.from('allergies').select('id', { count: 'exact', head: true }),
+    supabase.from('drug_checks').select('id', { count: 'exact', head: true }),
+    supabase.from('drug_checks').select('id', { count: 'exact', head: true }).eq('risk_level', 'danger'),
+  ]);
+
+  return {
+    allergyCount: allergies.count ?? 0,
+    totalChecks: checks.count ?? 0,
+    riskyChecks: risky.count ?? 0,
+  };
+}
+
 export function updateProfile(userId: string, fullName: string) {
   return supabase
     .from('profiles')

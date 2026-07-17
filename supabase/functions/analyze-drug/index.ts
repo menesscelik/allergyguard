@@ -10,11 +10,14 @@ const corsHeaders = {
 };
 
 type RiskLevel = 'safe' | 'warning' | 'danger';
+type Severity = 'mild' | 'moderate' | 'severe' | 'unknown';
 type SupabaseAdmin = ReturnType<typeof createClient>;
 type CanonicalIngredient = { name: string; normalized: string; rxcui: string | null };
+type CanonicalAllergyIngredient = CanonicalIngredient & { severity: Severity };
 type AnalysisResult = {
   risk_level: RiskLevel;
   matched_ingredients: string[];
+  severity_alert?: Severity | null;
   explanation: string;
   recommendation: string;
 };
@@ -49,6 +52,20 @@ function parseIngredients(value: string | null): string[] {
     .filter(Boolean);
 }
 
+function normalizeSeverity(value: unknown): Severity {
+  return value === 'mild' || value === 'moderate' || value === 'severe' || value === 'unknown'
+    ? value
+    : 'unknown';
+}
+
+function highestSeverity(values: Severity[]): Severity | null {
+  if (values.includes('severe')) return 'severe';
+  if (values.includes('moderate')) return 'moderate';
+  if (values.includes('mild')) return 'mild';
+  if (values.includes('unknown')) return 'unknown';
+  return null;
+}
+
 async function fetchJson(url: string): Promise<any | null> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -73,6 +90,22 @@ async function canonicalizeIngredients(names: string[]): Promise<CanonicalIngred
   );
 }
 
+async function canonicalizeAllergyIngredients(
+  records: Array<{ name: string; severity: Severity }>
+): Promise<CanonicalAllergyIngredient[]> {
+  return await Promise.all(
+    records
+      .filter((record) => record.name.trim())
+      .slice(0, 60)
+      .map(async (record) => ({
+        name: record.name,
+        normalized: normalize(record.name),
+        rxcui: await rxCuiForIngredient(record.name),
+        severity: record.severity,
+      }))
+  );
+}
+
 async function ingredientsFromTrDrugs(admin: SupabaseAdmin, drugName: string): Promise<string[]> {
   const { data } = await admin
     .from('tr_drugs')
@@ -86,17 +119,23 @@ async function ingredientsFromTrDrugs(admin: SupabaseAdmin, drugName: string): P
 function fallbackExplanation(
   risk: RiskLevel,
   matches: string[],
+  severityAlert: Severity | null,
   language: string
 ): Pick<AnalysisResult, 'explanation' | 'recommendation'> {
   const tr = language !== 'en';
   if (risk === 'danger') {
+    const severeExtra = severityAlert === 'severe'
+      ? (tr
+        ? ' Kayıtlı reaksiyon şiddetin “şiddetli” olduğu için bu sonucu acil öncelikli değerlendir.'
+        : ' Your saved reaction severity is “severe”, so treat this result as high priority.')
+      : '';
     return {
       explanation: tr
         ? `Doğrulanmış etken madde eşleşmesi bulundu: ${matches.join(', ')}.`
         : `A verified active-ingredient match was found: ${matches.join(', ')}.`,
       recommendation: tr
-        ? 'Bu ilacı kullanmadan önce doktoruna veya eczacına danış.'
-        : 'Consult your doctor or pharmacist before using this medicine.',
+        ? `Bu ilacı kullanmadan önce doktoruna veya eczacına danış.${severeExtra}`
+        : `Consult your doctor or pharmacist before using this medicine.${severeExtra}`,
     };
   }
   if (risk === 'warning') {
@@ -240,10 +279,10 @@ Deno.serve(async (req) => {
 
     const { data: allergies } = await admin
       .from('allergies')
-      .select('drug_name, active_ingredients')
+      .select('drug_name, active_ingredients, severity')
       .eq('user_id', user.id);
 
-    const allergyNames: string[] = [];
+    const allergyRecords: Array<{ name: string; severity: Severity }> = [];
     let unresolvedAllergy = false;
     for (const allergy of allergies ?? []) {
       let names = Array.isArray(allergy.active_ingredients)
@@ -251,29 +290,45 @@ Deno.serve(async (req) => {
         : [];
       if (names.length === 0) names = await ingredientsFromTrDrugs(admin, String(allergy.drug_name));
       if (names.length === 0) unresolvedAllergy = true;
-      allergyNames.push(...names);
+      const severity = normalizeSeverity(allergy.severity);
+      allergyRecords.push(...names.map((name) => ({ name, severity })));
     }
-    const allergyIngredients = await canonicalizeIngredients(allergyNames);
+    const allergyIngredients = await canonicalizeAllergyIngredients(allergyRecords);
     if (allergyIngredients.some((item) => item.rxcui)) evidenceSources.add('RxNorm');
 
-    const allergyKeys = new Set(
-      allergyIngredients.flatMap((item) => [item.normalized, item.rxcui ? `rxcui:${item.rxcui}` : ''])
-        .filter(Boolean)
-    );
-    const matches = testedIngredients
-      .filter((item) => allergyKeys.has(item.normalized) || (!!item.rxcui && allergyKeys.has(`rxcui:${item.rxcui}`)))
-      .map((item) => item.name);
+    const allergySeverityByKey = new Map<string, Severity>();
+    for (const item of allergyIngredients) {
+      allergySeverityByKey.set(item.normalized, item.severity);
+      if (item.rxcui) allergySeverityByKey.set(`rxcui:${item.rxcui}`, item.severity);
+    }
+    const matchedSeverities: Severity[] = [];
+    const matches = testedIngredients.flatMap((item) => {
+      const severity =
+        allergySeverityByKey.get(item.normalized) ??
+        (item.rxcui ? allergySeverityByKey.get(`rxcui:${item.rxcui}`) : undefined);
+      if (!severity) return [];
+      matchedSeverities.push(severity);
+      return [item.name];
+    });
+    const severityAlert = highestSeverity(matchedSeverities);
 
     const risk: RiskLevel = matches.length > 0
       ? 'danger'
       : testedIngredients.length === 0 || unresolvedAllergy
         ? 'warning'
         : 'safe';
-    const fallback = fallbackExplanation(risk, matches, language);
+    const fallback = fallbackExplanation(risk, matches, severityAlert, language);
     const aiExplanation = await explainWithOpenAI(
       risk, matches, drugName, testedIngredients.map((item) => item.name), language
     );
-    const explanation = aiExplanation ?? fallback;
+    const severityRecommendation = severityAlert === 'severe'
+      ? (language === 'en'
+        ? ' Your saved allergy severity is marked severe; seek professional guidance urgently.'
+        : ' Kayıtlı alerji şiddetin “şiddetli”; profesyonel destek almayı geciktirme.')
+      : '';
+    const explanation = aiExplanation
+      ? { ...aiExplanation, recommendation: `${aiExplanation.recommendation}${severityRecommendation}` }
+      : fallback;
 
     const { data: recorded, error: recordError } = await admin.rpc('record_drug_check_with_quota', {
       p_user_id: user.id,
@@ -298,6 +353,7 @@ Deno.serve(async (req) => {
     return json({
       risk_level: risk,
       matched_ingredients: matches,
+      severity_alert: severityAlert,
       explanation: explanation.explanation,
       recommendation: explanation.recommendation,
       tested_drug_name: drugName,

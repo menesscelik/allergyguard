@@ -21,14 +21,19 @@ export default function TabLayout() {
         tabBarActiveTintColor: PRIMARY,
         tabBarInactiveTintColor: Palette.textMuted,
         tabBarStyle: {
-          backgroundColor: Palette.surface,
+          position: 'absolute',
+          left: 14,
+          right: 14,
+          bottom: 10,
+          backgroundColor: Palette.surfaceGlass,
           borderTopWidth: 0,
-          height: 76,
+          height: 74,
           paddingTop: 8,
-          paddingBottom: 8,
-          boxShadow: '0 -6px 24px rgba(19, 46, 50, 0.08)',
+          paddingBottom: 10,
+          borderRadius: 26,
+          boxShadow: '0 -10px 32px rgba(23, 32, 51, 0.12)',
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '800' },
         headerShown: false,
         tabBarButton: HapticTab,
       }}>
@@ -44,6 +49,13 @@ export default function TabLayout() {
         options={{
           title: t('tabs.test'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="pills.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: t('tabs.history'),
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clock.arrow.circlepath" color={color} />,
         }}
       />
       <Tabs.Screen

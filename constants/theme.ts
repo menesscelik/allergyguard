@@ -3,51 +3,73 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-import { Platform } from 'react-native';
+import { DynamicColorIOS, Platform } from 'react-native';
+
+function adaptive(light: string, dark: string) {
+  if (Platform.OS === 'ios') {
+    return DynamicColorIOS({ light, dark } as never) as unknown as string;
+  }
+  return light;
+}
 
 /**
  * AllergyGuard color system.
  * Vibrant teal communicates energy and trust; indigo and coral add personality.
  */
 export const Palette = {
-  primary: '#0B8178',
-  primaryPressed: '#08665F',
-  primarySoft: '#CCFBF1',
-  primaryBorder: '#5EEAD4',
-  accent: '#4F46E5',
-  accentSoft: '#E0E7FF',
+  primary: '#089A8F',
+  primaryPressed: '#067C73',
+  primarySoft: adaptive('#C9FFF7', '#073B38'),
+  primaryBorder: adaptive('#67F6E7', '#20D8CB'),
+  accent: '#5B4BFF',
+  accentSoft: adaptive('#E8E7FF', '#211B56'),
+  accentPressed: '#4637D8',
+  coral: '#FF5C7A',
+  coralSoft: adaptive('#FFE7ED', '#4E1421'),
+  sky: '#0EA5E9',
+  skySoft: adaptive('#E0F2FE', '#0B2F44'),
   onPrimaryMuted: 'rgba(255, 255, 255, 0.72)',
   onPrimarySurface: 'rgba(255, 255, 255, 0.14)',
-  background: '#F7F8FC',
-  surface: '#FFFFFF',
-  surfaceMuted: '#EEF2FF',
-  text: '#172033',
-  textSecondary: '#5B6478',
-  textMuted: '#8B93A7',
-  border: '#E2E5F0',
-  borderStrong: '#CBD0DF',
+  background: adaptive('#F4F7FF', '#0B1020'),
+  surface: adaptive('#FFFFFF', '#151B2D'),
+  surfaceGlass: adaptive('rgba(255, 255, 255, 0.86)', 'rgba(21, 27, 45, 0.88)'),
+  surfaceMuted: adaptive('#EEF2FF', '#202942'),
+  text: adaptive('#172033', '#F6F8FF'),
+  textSecondary: adaptive('#5B6478', '#B8C1D8'),
+  textMuted: adaptive('#8B93A7', '#7E8AA5'),
+  border: adaptive('#E4E8F5', '#28324A'),
+  borderStrong: adaptive('#CBD0DF', '#3A4663'),
   success: '#059669',
-  successSoft: '#D1FAE5',
+  successSoft: adaptive('#D1FAE5', '#063D2A'),
   successBright: '#6EE7B7',
   warning: '#B45309',
-  warningSoft: '#FEF3C7',
-  warningBorder: '#FCD34D',
+  warningSoft: adaptive('#FEF3C7', '#4A3106'),
+  warningBorder: adaptive('#FCD34D', '#F59E0B'),
   severityMild: '#CA8A04',
   severityModerate: '#EA580C',
   danger: '#E11D48',
-  dangerSoft: '#FFE4E6',
+  dangerSoft: adaptive('#FFE4E6', '#4E0D1B'),
   premium: '#7C3AED',
-  premiumSoft: '#EDE9FE',
-  premiumBorder: '#C4B5FD',
+  premiumSoft: adaptive('#EDE9FE', '#2B174E'),
+  premiumBorder: adaptive('#C4B5FD', '#A78BFA'),
   white: '#FFFFFF',
   black: '#0A1719',
 } as const;
 
 export const Radius = {
   small: 10,
-  medium: 14,
-  large: 20,
+  medium: 16,
+  large: 24,
+  xlarge: 30,
   pill: 999,
+} as const;
+
+export const Shadows = {
+  soft: '0 8px 22px rgba(23, 32, 51, 0.07)',
+  card: '0 12px 30px rgba(23, 32, 51, 0.10)',
+  hero: '0 18px 44px rgba(11, 129, 120, 0.22)',
+  accent: '0 18px 44px rgba(79, 70, 229, 0.22)',
+  danger: '0 14px 32px rgba(225, 29, 72, 0.16)',
 } as const;
 
 export const Colors = {

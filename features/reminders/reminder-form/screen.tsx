@@ -16,6 +16,7 @@ import {
 import { FormInput, PrimaryButton } from '@/components/form';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
+import { useResponsiveLayout } from '@/lib/responsive';
 
 function timeToDate(t: string): Date {
   const [h, m] = t.split(':').map((n) => parseInt(n, 10));
@@ -32,6 +33,7 @@ function dateToTime(d: Date): string {
 export default function AddReminderScreen() {
   const { session } = useAuth();
   const { t, language } = useLocalization();
+  const layout = useResponsiveLayout();
   const dayLabels = language === 'tr'
     ? ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
     : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -118,23 +120,33 @@ export default function AddReminderScreen() {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.introCard}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },
+          ]}
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardShouldPersistTaps="handled">
+          <View style={[styles.introCard, layout.centerContent, { padding: layout.heroPadding }]}>
             <View style={styles.introIcon}><Text style={styles.introEmoji}>⏰</Text></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.introTitle}>{t('reminders.title')}</Text>
               <Text style={styles.introText}>{t('reminders.subtitle')}</Text>
             </View>
           </View>
-          <FormInput
-            label={t('allergies.drugName')}
-            value={drugName}
-            onChangeText={setDrugName}
-            placeholder={t('allergies.drugPlaceholder')}
-          />
+          <View style={layout.centerContent}>
+            <FormInput
+              label={t('allergies.drugName')}
+              value={drugName}
+              onChangeText={setDrugName}
+              placeholder={t('allergies.drugPlaceholder')}
+            />
+          </View>
 
-          <Text style={styles.label}>{t('reminders.time')}</Text>
-          <View style={styles.timePicker}>
+          <View style={layout.centerContent}>
+            <Text style={styles.label}>{t('reminders.time')}</Text>
+          </View>
+          <View style={[styles.timePicker, layout.centerContent]}>
             <DateTimePicker
               value={time}
               mode="time"
@@ -144,8 +156,10 @@ export default function AddReminderScreen() {
             />
           </View>
 
-          <Text style={styles.label}>{t('reminders.days')}</Text>
-          <View style={styles.dayRow}>
+          <View style={layout.centerContent}>
+            <Text style={styles.label}>{t('reminders.days')}</Text>
+          </View>
+          <View style={[styles.dayRow, layout.centerContent]}>
             {dayLabels.map((label, i) => {
               const day = i + 1;
               const selected = days.includes(day);
@@ -161,7 +175,7 @@ export default function AddReminderScreen() {
               );
             })}
           </View>
-          <View style={styles.quickRow}>
+          <View style={[styles.quickRow, layout.centerContent]}>
             <Pressable onPress={() => setDays([1, 2, 3, 4, 5, 6, 7])}>
               <Text style={styles.quickLink}>{t('reminders.everyday')}</Text>
             </Pressable>
@@ -170,18 +184,22 @@ export default function AddReminderScreen() {
             </Pressable>
           </View>
 
-          <FormInput
-            label={t('reminders.notes')}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder={t('reminders.notesPlaceholder')}
-          />
+          <View style={layout.centerContent}>
+            <FormInput
+              label={t('reminders.notes')}
+              value={notes}
+              onChangeText={setNotes}
+              placeholder={t('reminders.notesPlaceholder')}
+            />
+          </View>
 
-          <PrimaryButton
-            title={isEdit ? t('common.save') : t('reminders.addTitle')}
-            onPress={handleSave}
-            loading={saving}
-          />
+          <View style={layout.centerContent}>
+            <PrimaryButton
+              title={isEdit ? t('common.save') : t('reminders.addTitle')}
+              onPress={handleSave}
+              loading={saving}
+            />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </>

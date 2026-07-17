@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Palette, Radius } from '@/constants/theme';
+import { Palette, Radius, Shadows } from '@/constants/theme';
 import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
@@ -12,11 +12,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginHorizontal: 16,
-    marginTop: 14,
+    marginTop: 4,
     marginBottom: 16,
     padding: 20,
-    borderRadius: Radius.large,
+    borderRadius: Radius.xlarge,
     backgroundColor: Palette.accentSoft,
+    boxShadow: Shadows.soft,
   },
   eyebrow: {
     color: Palette.accent,
@@ -42,10 +43,58 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 8px 20px rgba(79, 70, 229, 0.18)',
+    boxShadow: Shadows.accent,
   },
   clockEmoji: {
     fontSize: 29,
+  },
+  calendarCard: {
+    marginBottom: 14,
+    borderRadius: Radius.xlarge,
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    boxShadow: Shadows.soft,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 12,
+  },
+  calendarTitle: {
+    color: Palette.text,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  calendarSubtitle: {
+    color: Palette.textSecondary,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  calendarDays: {
+    flexDirection: 'row',
+    gap: 7,
+  },
+  dayPill: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 8,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.surfaceMuted,
+  },
+  dayLabel: {
+    color: Palette.textMuted,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  dayCount: {
+    color: Palette.primary,
+    fontSize: 16,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
   },
   list: {
     paddingHorizontal: 20,
@@ -56,12 +105,12 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Palette.surface,
-    borderRadius: Radius.medium,
+    borderRadius: Radius.large,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: '0 4px 14px rgba(19, 46, 50, 0.05)',
+    boxShadow: Shadows.soft,
   },
   time: {
     fontSize: 24,
@@ -83,6 +132,42 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     color: Palette.textMuted,
     marginTop: 2,
+  },
+  intakeRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+  },
+  intakeButton: {
+    borderRadius: Radius.pill,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+  },
+  intakeTaken: {
+    backgroundColor: Palette.successSoft,
+    borderColor: Palette.success,
+  },
+  intakeSkipped: {
+    backgroundColor: Palette.warningSoft,
+    borderColor: Palette.warning,
+  },
+  intakeSelected: {
+    backgroundColor: Palette.primary,
+    borderColor: Palette.primary,
+  },
+  intakeText: {
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  intakeTakenText: {
+    color: Palette.success,
+  },
+  intakeSkippedText: {
+    color: Palette.warning,
+  },
+  intakeSelectedText: {
+    color: Palette.white,
   },
   cardRight: {
     alignItems: 'flex-end',
@@ -121,8 +206,6 @@ export const styles = StyleSheet.create({
     backgroundColor: PRIMARY,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 5px 16px rgba(11, 129, 120, 0.34)',
+    boxShadow: Shadows.hero,
   },
 });
-
-
