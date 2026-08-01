@@ -24,3 +24,7 @@ export async function saveAuthPreferences(rememberSession: boolean, email: strin
     await AsyncStorage.removeItem(REMEMBERED_EMAIL_KEY);
   }
 }
+
+export async function clearAuthPreferences() {
+  await AsyncStorage.multiRemove([REMEMBER_SESSION_KEY, REMEMBERED_EMAIL_KEY]);
+}

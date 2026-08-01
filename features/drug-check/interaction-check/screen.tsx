@@ -6,6 +6,7 @@ import { checkLocalInteraction, getPremiumStatus, type InteractionResult } from 
 import { styles } from './styles';
 
 import { PrimaryButton } from '@/components/form';
+import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
@@ -49,7 +50,9 @@ export default function InteractionCheckScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={[styles.content, { paddingHorizontal: layout.pagePadding }]}
-        contentInsetAdjustmentBehavior="automatic">
+        automaticallyAdjustKeyboardInsets
+        contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps="handled">
         <View style={[styles.hero, layout.centerContent]}>
           <Text style={styles.badge}>🧬</Text>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('interaction.hero')}</Text>
@@ -68,6 +71,7 @@ export default function InteractionCheckScreen() {
             <View style={[styles.card, layout.centerContent]}>
               <Text style={styles.groupTitle}>{t('interaction.firstDrug')}</Text>
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
                 value={firstName}
                 onChangeText={setFirstName}
                 placeholder={t('interaction.drugNamePlaceholder')}
@@ -75,6 +79,7 @@ export default function InteractionCheckScreen() {
                 style={styles.input}
               />
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
                 value={firstIngredients}
                 onChangeText={setFirstIngredients}
                 placeholder={t('interaction.ingredientsPlaceholder')}
@@ -84,6 +89,7 @@ export default function InteractionCheckScreen() {
 
               <Text style={styles.groupTitle}>{t('interaction.secondDrug')}</Text>
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
                 value={secondName}
                 onChangeText={setSecondName}
                 placeholder={t('interaction.drugNamePlaceholder')}
@@ -91,6 +97,7 @@ export default function InteractionCheckScreen() {
                 style={styles.input}
               />
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
                 value={secondIngredients}
                 onChangeText={setSecondIngredients}
                 placeholder={t('interaction.ingredientsPlaceholder')}

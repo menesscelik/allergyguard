@@ -14,8 +14,9 @@ export const styles = StyleSheet.create({
   },
   iconBadge: {
     width: 68, height: 68, borderRadius: 24, alignSelf: 'center',
-    alignItems: 'center', justifyContent: 'center', backgroundColor: Palette.primary,
-    boxShadow: Shadows.hero,
+    alignItems: 'center', justifyContent: 'center', backgroundColor: Palette.surface,
+    borderWidth: 1, borderColor: Palette.border,
+    boxShadow: Shadows.soft,
   },
   icon: { fontSize: 29 },
   title: {
@@ -34,7 +35,7 @@ export const styles = StyleSheet.create({
   formCard: {
     padding: 20, borderRadius: Radius.xlarge, backgroundColor: Palette.surface,
     borderWidth: 1, borderColor: Palette.border,
-    boxShadow: Shadows.card,
+    boxShadow: Shadows.soft,
   },
   link: {
     color: PRIMARY,
@@ -49,4 +50,3 @@ export const styles = StyleSheet.create({
     color: Palette.textSecondary,
   },
 });
-

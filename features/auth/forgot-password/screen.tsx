@@ -1,8 +1,8 @@
 import { styles } from './styles';
 import { sendPasswordReset } from './service';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PrimaryButton } from '@/components/form';
@@ -25,38 +25,41 @@ export default function ForgotPasswordScreen() {
       Alert.alert(t('common.error'), error.message);
       return;
     }
-    Alert.alert(t('auth.forgot.sent'), t('auth.forgot.sentMessage'), [
-      {
-        text: 'OK',
-        onPress: () =>
-          router.push({ pathname: '/reset-password', params: { email: email.trim() } }),
-      },
-    ]);
+    Alert.alert(t('auth.forgot.sent'), t('auth.forgot.sentMessage'));
   }
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.iconBadge}><Text style={styles.icon}>✉️</Text></View>
-      <Text style={styles.title}>{t('auth.forgot.title')}</Text>
-      <Text style={styles.subtitle}>{t('auth.forgot.subtitle')}</Text>
+      <KeyboardAvoidingView
+        style={styles.keyboard}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          automaticallyAdjustKeyboardInsets
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.iconBadge}><Text style={styles.icon}>✉️</Text></View>
+          <Text style={styles.title}>{t('auth.forgot.title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.forgot.subtitle')}</Text>
 
-      <View style={styles.formCard}>
-        <FormInput
-          label={t('common.email')}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          autoComplete="email"
-          placeholder="ornek@eposta.com"
-        />
+          <View style={styles.formCard}>
+            <FormInput
+              label={t('common.email')}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+              placeholder="ornek@eposta.com"
+            />
 
-        <PrimaryButton title={t('auth.forgot.submit')} onPress={handleReset} loading={loading} />
-      </View>
+            <PrimaryButton title={t('auth.forgot.submit')} onPress={handleReset} loading={loading} />
+          </View>
 
-      <Link href="/(auth)/login" style={styles.link}>
-        {t('auth.forgot.back')}
-      </Link>
+          <Link href="/(auth)/login" style={styles.link}>
+            {t('auth.forgot.back')}
+          </Link>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

@@ -1,0 +1,3 @@
+-- Intentionally empty.
+-- Admin permissions should be granted from the Admin Panel or Supabase SQL Editor,
+-- not by committing personal email addresses into project migrations.

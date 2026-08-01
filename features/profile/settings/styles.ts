@@ -32,5 +32,33 @@ export const styles = StyleSheet.create({
     borderColor: Palette.primary,
     color: Palette.primary,
   },
+  themeSegment: {
+    flexDirection: 'row',
+    padding: 4,
+    borderRadius: Radius.pill,
+    backgroundColor: Palette.surfaceMuted,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    gap: 4,
+  },
+  themeOption: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 11,
+    borderRadius: Radius.pill,
+  },
+  themeOptionSelected: {
+    backgroundColor: Palette.primary,
+    boxShadow: Shadows.soft,
+  },
+  themeOptionText: {
+    color: Palette.textSecondary,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  themeOptionTextSelected: {
+    color: Palette.white,
+  },
   systemText: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20 },
 });

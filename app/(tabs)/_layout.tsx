@@ -1,77 +1,79 @@
-import { Tabs } from 'expo-router';
+import { Redirect } from 'expo-router';
+import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import React, { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { PRIMARY } from '@/components/form';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { SwipeableTabsShell } from '@/components/swipeable-tabs-shell';
 import { Palette } from '@/constants/theme';
-import { syncAllNotifications } from '@/lib/notifications';
+import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
+import { syncAllNotifications } from '@/lib/notifications';
 
 export default function TabLayout() {
+  const { session, loading } = useAuth();
   const { t } = useLocalization();
   // Uygulama açılınca zamanlanmış bildirimleri veritabanıyla eşitle
   useEffect(() => {
-    syncAllNotifications().catch(() => {});
-  }, []);
+    if (session?.user?.id) {
+      syncAllNotifications().catch(() => {});
+    }
+  }, [session?.user?.id]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!session?.user?.id) {
+    return <Redirect href="/(auth)/login" />;
+  }
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: PRIMARY,
-        tabBarInactiveTintColor: Palette.textMuted,
-        tabBarStyle: {
-          position: 'absolute',
-          left: 14,
-          right: 14,
-          bottom: 10,
-          backgroundColor: Palette.surfaceGlass,
-          borderTopWidth: 0,
-          height: 74,
-          paddingTop: 8,
-          paddingBottom: 10,
-          borderRadius: 26,
-          boxShadow: '0 -10px 32px rgba(23, 32, 51, 0.12)',
-        },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '800' },
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: t('tabs.allergies'),
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="list.bullet" color={color} />,
+    <SwipeableTabsShell>
+      <NativeTabs
+        blurEffect="systemMaterial"
+        iconColor={{ default: Palette.textMuted, selected: Palette.primary }}
+        labelStyle={{
+          default: {
+            fontSize: 11,
+            fontWeight: '600',
+          },
+          selected: {
+            color: Palette.primary,
+            fontSize: 11,
+            fontWeight: '700',
+          },
         }}
-      />
-      <Tabs.Screen
-        name="test"
-        options={{
-          title: t('tabs.test'),
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="pills.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: t('tabs.history'),
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="clock.arrow.circlepath" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="reminders"
-        options={{
-          title: t('tabs.reminders'),
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="alarm.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: t('tabs.profile'),
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+        minimizeBehavior="onScrollDown"
+        tintColor={Palette.primary}>
+        <NativeTabs.Trigger name="index">
+          <Icon sf={{ default: 'list.bullet', selected: 'list.bullet' }} drawable="ic_menu_sort_by_size" />
+          <Label>{t('tabs.allergies')}</Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="test">
+          <Icon sf={{ default: 'pills', selected: 'pills.fill' }} drawable="ic_menu_search" />
+          <Label>{t('tabs.test')}</Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="history" role="history">
+          <Icon sf={{ default: 'clock.arrow.circlepath', selected: 'clock.arrow.circlepath' }} drawable="ic_menu_recent_history" />
+          <Label>{t('tabs.history')}</Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="reminders">
+          <Icon sf={{ default: 'alarm', selected: 'alarm.fill' }} drawable="ic_lock_idle_alarm" />
+          <Label>{t('tabs.reminders')}</Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="profile">
+          <Icon sf={{ default: 'person', selected: 'person.fill' }} drawable="ic_menu_myplaces" />
+          <Label>{t('tabs.profile')}</Label>
+        </NativeTabs.Trigger>
+      </NativeTabs>
+    </SwipeableTabsShell>
   );
 }

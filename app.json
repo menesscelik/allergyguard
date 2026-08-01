@@ -5,12 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "allergyguard",
+    "scheme": "com.menescelik.allergyguard",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.menescelik.allergyguard"
+      "bundleIdentifier": "com.menescelik.allergyguard",
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "com.menescelik.allergyguard",
@@ -48,7 +49,17 @@
       ],
       "@react-native-community/datetimepicker",
       "expo-localization",
-      "./plugins/without-push-entitlement.js"
+      "./plugins/without-push-entitlement.js",
+      "expo-apple-authentication",
+      "react-native-adapty",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "dynamic"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

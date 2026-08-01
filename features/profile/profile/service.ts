@@ -1,3 +1,4 @@
+import { clearAuthPreferences } from '@/lib/auth-preferences';
 import { notificationsEnabled, setNotificationsEnabled } from '@/lib/notifications';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/lib/types';
@@ -23,15 +24,22 @@ export async function getProfileStats() {
   };
 }
 
-export function updateProfile(userId: string, fullName: string) {
+export function updateProfile(userId: string, fullName: string, username: string, birthDate: string) {
   return supabase
     .from('profiles')
-    .update({ full_name: fullName.trim() || null, updated_at: new Date().toISOString() })
+    .update({
+      full_name: fullName.trim() || null,
+      username: username.trim().toLowerCase() || null,
+      birth_date: birthDate || null,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', userId);
 }
 
-export function signOut() {
-  return supabase.auth.signOut();
+export async function signOut() {
+  const result = await supabase.auth.signOut();
+  await Promise.all([clearAuthPreferences(), supabase.auth.signOut({ scope: 'local' })]);
+  return result;
 }
 
 export async function deleteAccount() {

@@ -15,9 +15,9 @@ export const styles = StyleSheet.create({
     gap: 14,
     padding: 16,
     borderRadius: Radius.xlarge,
-    backgroundColor: Palette.primarySoft,
+    backgroundColor: Palette.surface,
     borderWidth: 1,
-    borderColor: Palette.primaryBorder,
+    borderColor: Palette.border,
     marginBottom: 20,
     boxShadow: Shadows.soft,
   },
@@ -110,4 +110,3 @@ export const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 });
-

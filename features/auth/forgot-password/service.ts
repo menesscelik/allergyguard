@@ -1,8 +1,9 @@
 import { supabase } from '@/lib/supabase';
 
-// E-postaya 6 haneli doğrulama kodu gönderir (şablonda {{ .Token }} kullanılır).
-// Bağlantı yerine kod: Outlook gibi istemcilerin bağlantıyı önceden açıp
-// tek kullanımlık token'ı tüketmesi sorununu ortadan kaldırır.
+const AUTH_CALLBACK_URL = 'com.menescelik.allergyguard://auth/callback';
+
 export function sendPasswordReset(email: string) {
-  return supabase.auth.resetPasswordForEmail(email.trim());
+  return supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: AUTH_CALLBACK_URL,
+  });
 }

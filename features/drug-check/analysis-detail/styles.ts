@@ -47,12 +47,12 @@ export const styles = StyleSheet.create({
   timeline: {
     padding: 16,
     borderRadius: Radius.xlarge,
-    backgroundColor: Palette.accentSoft,
+    backgroundColor: Palette.surface,
     borderWidth: 1,
-    borderColor: Palette.premiumBorder,
+    borderColor: Palette.border,
     gap: 8,
   },
-  timelineTitle: { color: Palette.accent, fontSize: 15, fontWeight: '900' },
+  timelineTitle: { color: Palette.primary, fontSize: 15, fontWeight: '900' },
   timelineText: { color: Palette.textSecondary, fontSize: 13, lineHeight: 19 },
   disclaimer: { color: Palette.textSecondary, fontSize: 12, lineHeight: 18, textAlign: 'center', marginTop: 4 },
 });

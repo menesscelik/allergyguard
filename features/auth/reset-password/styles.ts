@@ -4,12 +4,14 @@ import { Palette, Radius, Shadows } from '@/constants/theme';
 export const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Palette.background },
   keyboard: { flex: 1 },
-  content: { flex: 1, justifyContent: 'center', padding: 24 },
+  content: { flexGrow: 1, justifyContent: 'center', padding: 24 },
   iconBadge: {
     width: 64,
     height: 64,
     borderRadius: 22,
-    backgroundColor: Palette.primary,
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
@@ -35,7 +37,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.surface,
     borderWidth: 1,
     borderColor: Palette.border,
-    boxShadow: Shadows.card,
+    boxShadow: Shadows.soft,
   },
   errorCard: {
     padding: 20,
@@ -46,5 +48,18 @@ export const styles = StyleSheet.create({
   },
   errorTitle: { color: Palette.danger, fontSize: 16, fontWeight: '800' },
   errorText: { color: Palette.textSecondary, fontSize: 13, lineHeight: 19, marginTop: 6 },
+  errorAction: {
+    alignItems: 'center',
+    borderRadius: Radius.large,
+    backgroundColor: Palette.surface,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    marginTop: 14,
+    paddingVertical: 12,
+  },
+  errorActionText: {
+    color: Palette.primary,
+    fontSize: 14,
+    fontWeight: '900',
+  },
 });
-

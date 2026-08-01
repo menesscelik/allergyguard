@@ -12,8 +12,8 @@ export const styles = StyleSheet.create({
   },
   drugHero: {
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18,
-    borderRadius: Radius.xlarge, backgroundColor: Palette.accentSoft,
-    borderWidth: 1, borderColor: Palette.premiumBorder, marginBottom: 20,
+    borderRadius: Radius.xlarge, backgroundColor: Palette.surface,
+    borderWidth: 1, borderColor: Palette.border, marginBottom: 20,
     boxShadow: Shadows.soft,
   },
   drugBadge: {
@@ -21,7 +21,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center', backgroundColor: Palette.surface,
   },
   drugEmoji: { fontSize: 27 },
-  heroEyebrow: { color: Palette.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1.1 },
+  heroEyebrow: { color: Palette.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.1 },
   drugName: {
     fontSize: 23,
     fontWeight: '800',
@@ -168,13 +168,13 @@ export const styles = StyleSheet.create({
   methodCard: {
     padding: 16,
     borderRadius: Radius.xlarge,
-    backgroundColor: Palette.accentSoft,
+    backgroundColor: Palette.surface,
     borderWidth: 1,
-    borderColor: Palette.premiumBorder,
+    borderColor: Palette.border,
     marginTop: 12,
   },
   methodTitle: {
-    color: Palette.accent,
+    color: Palette.primary,
     fontSize: 15,
     fontWeight: '900',
     marginBottom: 8,

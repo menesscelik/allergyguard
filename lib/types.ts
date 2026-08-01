@@ -19,11 +19,25 @@ export type Allergy = {
 export type Profile = {
   id: string;
   full_name: string | null;
+  username: string | null;
+  birth_date: string | null;
   language: 'tr' | 'en';
   is_premium: boolean;
+  is_admin: boolean;
   premium_until: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type PromoCode = {
+  code: string;
+  description: string | null;
+  premium_days: number;
+  max_redemptions: number | null;
+  redeemed_count: number;
+  expires_at: string | null;
+  is_active: boolean;
+  created_at: string;
 };
 
 export const SEVERITY_LABELS: Record<Severity, string> = {

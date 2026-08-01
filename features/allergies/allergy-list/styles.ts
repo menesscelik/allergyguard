@@ -11,23 +11,23 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 20,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 18,
     marginHorizontal: 0,
     marginBottom: 6,
-    backgroundColor: Palette.primary,
+    backgroundColor: Palette.surface,
     borderRadius: Radius.xlarge,
     borderWidth: 1,
-    borderColor: Palette.primary,
+    borderColor: Palette.border,
     overflow: 'hidden',
-    boxShadow: Shadows.hero,
+    boxShadow: Shadows.soft,
   },
   heroCopy: {
     flex: 1,
   },
   eyebrow: {
-    color: Palette.primaryBorder,
+    color: Palette.primary,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.2,
@@ -35,11 +35,11 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 29,
     fontWeight: '800',
-    color: Palette.white,
+    color: Palette.text,
     marginTop: 3,
   },
   subtitle: {
-    color: Palette.onPrimaryMuted,
+    color: Palette.textSecondary,
     fontSize: 13,
     marginTop: 3,
   },
@@ -47,7 +47,7 @@ export const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 20,
-    backgroundColor: Palette.onPrimarySurface,
+    backgroundColor: Palette.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 12,
@@ -64,7 +64,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: Radius.pill,
-    backgroundColor: Palette.onPrimarySurface,
+    backgroundColor: Palette.surfaceMuted,
     gap: 6,
   },
   statusDot: {
@@ -74,7 +74,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.successBright,
   },
   statusText: {
-    color: Palette.white,
+    color: Palette.textSecondary,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -152,8 +152,8 @@ export const styles = StyleSheet.create({
     boxShadow: Shadows.soft,
   },
   quickActionPrimary: {
-    backgroundColor: Palette.accent,
-    borderColor: Palette.accent,
+    backgroundColor: Palette.surface,
+    borderColor: Palette.primaryBorder,
   },
   quickPressed: {
     opacity: 0.82,
@@ -168,7 +168,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.surfaceMuted,
   },
   quickIconPrimary: {
-    backgroundColor: Palette.onPrimarySurface,
+    backgroundColor: Palette.primarySoft,
   },
   quickTitle: {
     color: Palette.text,
@@ -177,7 +177,7 @@ export const styles = StyleSheet.create({
     marginTop: 11,
   },
   quickTitlePrimary: {
-    color: Palette.white,
+    color: Palette.text,
   },
   quickCaption: {
     color: Palette.textMuted,
@@ -185,7 +185,7 @@ export const styles = StyleSheet.create({
     marginTop: 2,
   },
   quickCaptionPrimary: {
-    color: Palette.onPrimaryMuted,
+    color: Palette.textSecondary,
   },
   listHeading: {
     flexDirection: 'row',

@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
@@ -100,6 +101,7 @@ export default function DrugTestScreen() {
       <View style={[styles.searchCard, { margin: layout.pagePadding, padding: layout.isCompact ? 12 : 14 }]}>
         <View style={[styles.searchRow, { flexDirection: layout.isCompact ? 'column' : 'row' }]}>
           <TextInput
+            inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
             style={styles.input}
             value={query}
             onChangeText={setQuery}

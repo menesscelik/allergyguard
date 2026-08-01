@@ -8,6 +8,8 @@ import {
   type TextInputProps,
 } from 'react-native';
 
+import { KEYBOARD_DISMISS_ACCESSORY_ID } from './keyboard-dismiss-accessory';
+
 import { Palette, Radius, Shadows } from '@/constants/theme';
 
 export const PRIMARY = Palette.primary;
@@ -21,6 +23,7 @@ export function FormInput({ label, style, ...props }: FormInputProps) {
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
+        inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
         placeholderTextColor={Palette.textMuted}
         style={[styles.input, style]}
         {...props}

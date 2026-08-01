@@ -156,7 +156,7 @@ export default function AllergiesScreen() {
                 <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('allergies.hero')}</Text>
                 <Text style={styles.subtitle}>
                   {allergies.length > 0
-                    ? t('allergies.active', { count: allergies.length })
+                    ? t(allergies.length === 1 ? 'allergies.active_one' : 'allergies.active_other', { count: allergies.length })
                     : t('allergies.start')}
                 </Text>
                 <View style={styles.statusPill}>

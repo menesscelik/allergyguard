@@ -1,29 +1,26 @@
 import { styles } from './styles';
-import { updatePassword, verifyRecoveryCode } from './service';
+import { updatePassword } from './service';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PrimaryButton } from '@/components/form';
+import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
 
 export default function ResetPasswordScreen() {
+  const { session } = useAuth();
   const { t } = useLocalization();
-  const params = useLocalSearchParams<{ email?: string }>();
-  const [email, setEmail] = useState(params.email ?? '');
-  const [code, setCode] = useState('');
+  const params = useLocalSearchParams<{ verified?: string }>();
+  const verifiedByLink = params.verified === '1' && !!session;
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [saving, setSaving] = useState(false);
 
   async function handleUpdatePassword() {
-    if (!email.trim()) {
-      Alert.alert(t('common.error'), t('auth.forgot.missing'));
-      return;
-    }
-    if (code.trim().length < 6) {
-      Alert.alert(t('common.error'), t('auth.reset.codeMissing'));
+    if (!verifiedByLink) {
+      Alert.alert(t('common.error'), t('auth.reset.missingSession'));
       return;
     }
     if (password.length < 6) {
@@ -37,15 +34,6 @@ export default function ResetPasswordScreen() {
 
     setSaving(true);
 
-    // 1) Kodu doğrula (başarılıysa geçici oturum açılır)
-    const { error: verifyError } = await verifyRecoveryCode(email, code);
-    if (verifyError) {
-      setSaving(false);
-      Alert.alert(t('auth.reset.invalid'), verifyError.message);
-      return;
-    }
-
-    // 2) Yeni şifreyi kaydet
     const { error } = await updatePassword(password);
     setSaving(false);
     if (error) {
@@ -63,31 +51,28 @@ export default function ResetPasswordScreen() {
       <KeyboardAvoidingView
         style={styles.keyboard}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.content}>
+        <ScrollView
+          automaticallyAdjustKeyboardInsets
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled">
           <View style={styles.iconBadge}>
             <Text style={styles.icon}>🔐</Text>
           </View>
           <Text style={styles.title}>{t('auth.reset.title')}</Text>
-          <Text style={styles.subtitle}>{t('auth.reset.subtitle')}</Text>
+          <Text style={styles.subtitle}>
+            {verifiedByLink ? t('auth.reset.subtitle') : t('auth.reset.missingSession')}
+          </Text>
 
-          <View style={styles.card}>
-            <FormInput
-              label={t('common.email')}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-              placeholder="ornek@eposta.com"
-            />
-            <FormInput
-              label={t('auth.reset.code')}
-              value={code}
-              onChangeText={setCode}
-              keyboardType="number-pad"
-              maxLength={6}
-              placeholder={t('auth.reset.codePlaceholder')}
-            />
+          {!verifiedByLink ? (
+            <View style={styles.errorCard}>
+              <Text style={styles.errorTitle}>{t('auth.reset.linkFailed')}</Text>
+              <Text style={styles.errorText}>{t('auth.reset.request')}</Text>
+              <Pressable onPress={() => router.replace('/(auth)/forgot-password')} style={styles.errorAction}>
+                <Text style={styles.errorActionText}>{t('auth.reset.requestButton')}</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <View style={styles.card}>
             <FormInput
               label={t('auth.reset.newPassword')}
               value={password}
@@ -107,8 +92,9 @@ export default function ResetPasswordScreen() {
               onPress={handleUpdatePassword}
               loading={saving}
             />
-          </View>
-        </View>
+            </View>
+          )}
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

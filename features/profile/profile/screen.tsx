@@ -31,6 +31,8 @@ export default function ProfileScreen() {
   const layout = useResponsiveLayout();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
+  const [birthDateInput, setBirthDateInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [notifsOn, setNotifsOn] = useState(true);
@@ -54,12 +56,26 @@ export default function ProfileScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!session) return;
+      if (!session) {
+        setProfile(null);
+        setFullName('');
+        setUsername('');
+        setBirthDateInput('');
+        setStats({ allergyCount: 0, totalChecks: 0, riskyChecks: 0 });
+        return;
+      }
       getProfile(session.user.id)
         .then(({ data, error }) => {
           if (!error && data) {
             setProfile(data as Profile);
             setFullName(data.full_name ?? '');
+            setUsername(data.username ?? '');
+            setBirthDateInput(formatBirthDateForDisplay(data.birth_date));
+          } else {
+            setProfile(null);
+            setFullName('');
+            setUsername('');
+            setBirthDateInput('');
           }
         });
       getProfileStats().then(setStats).catch(() => {});
@@ -68,8 +84,20 @@ export default function ProfileScreen() {
 
   async function handleSave() {
     if (!session) return;
+    const normalizedUsername = username.trim().toLowerCase();
+    const birthDate = parseBirthDate(birthDateInput);
+
+    if (normalizedUsername && !/^[a-z0-9_]{3,24}$/.test(normalizedUsername)) {
+      Alert.alert(t('common.error'), t('auth.register.usernameInvalid'));
+      return;
+    }
+    if (birthDateInput.trim() && !birthDate) {
+      Alert.alert(t('common.error'), t('auth.register.birthDateInvalid'));
+      return;
+    }
+
     setSaving(true);
-    const { error } = await updateProfile(session.user.id, fullName);
+    const { error } = await updateProfile(session.user.id, fullName, normalizedUsername, birthDate ?? '');
     setSaving(false);
     if (error) {
       Alert.alert(t('common.error'), error.message);
@@ -122,10 +150,12 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
+        automaticallyAdjustKeyboardInsets
         contentContainerStyle={[
           styles.content,
           { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },
-        ]}>
+        ]}
+        keyboardShouldPersistTaps="handled">
         <View style={[styles.profileHero, layout.centerContent, { padding: layout.heroPadding }]}>
           <View style={[styles.avatar, { width: layout.badgeSize, height: layout.badgeSize }]}>
             <Text style={styles.avatarText}>
@@ -165,6 +195,23 @@ export default function ProfileScreen() {
             value={fullName}
             onChangeText={setFullName}
             placeholder={t('auth.register.namePlaceholder')}
+          />
+          <FormInput
+            label={t('profile.username')}
+            value={username}
+            onChangeText={(value) => setUsername(value.replace(/\s+/g, '').toLowerCase())}
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={24}
+            placeholder={t('auth.register.usernamePlaceholder')}
+          />
+          <FormInput
+            label={t('profile.birthDate')}
+            value={birthDateInput}
+            onChangeText={(value) => setBirthDateInput(formatBirthDateInput(value))}
+            keyboardType="number-pad"
+            maxLength={10}
+            placeholder={t('auth.register.birthDatePlaceholder')}
           />
         </View>
 
@@ -223,6 +270,13 @@ export default function ProfileScreen() {
           <Text style={styles.navArrow}>›</Text>
         </Pressable>
 
+        {profile?.is_admin && (
+          <Pressable style={[styles.adminRow, layout.centerContent]} onPress={() => router.push('/admin' as never)}>
+            <Text style={styles.adminTitle}>🛠️ {t('admin.title')}</Text>
+            <Text style={styles.adminArrow}>›</Text>
+          </Pressable>
+        )}
+
         <Pressable style={[styles.premiumCard, layout.centerContent]} onPress={() => router.push('/premium' as never)}>
           <Text style={styles.premiumTitle}>
             {profile?.is_premium ? t('profile.premium') : t('profile.free')}
@@ -250,4 +304,35 @@ export default function ProfileScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function formatBirthDateInput(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
+}
+
+function formatBirthDateForDisplay(value: string | null) {
+  if (!value) return '';
+  const [year, month, day] = value.split('-');
+  if (!year || !month || !day) return '';
+  return `${day}.${month}.${year}`;
+}
+
+function parseBirthDate(value: string) {
+  const [dayText, monthText, yearText] = value.split('.');
+  const day = Number(dayText);
+  const month = Number(monthText);
+  const year = Number(yearText);
+  if (!day || !month || !year || year < 1900) return null;
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const isValid =
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day &&
+    date.getTime() <= Date.now();
+
+  return isValid ? date.toISOString().slice(0, 10) : null;
 }

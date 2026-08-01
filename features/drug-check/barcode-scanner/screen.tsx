@@ -49,8 +49,8 @@ export default function ScanScreen() {
       Alert.alert(t('common.error'), error.message);
       return;
     }
-    Alert.alert('Eklendi ✅', `"${drug.name}" alerji listene eklendi.`, [
-      { text: 'Tamam', onPress: () => router.back() },
+    Alert.alert(t('scan.addedTitle'), t('scan.addedMessage', { name: drug.name }), [
+      { text: t('common.ok'), onPress: () => router.back() },
     ]);
   }
 
@@ -113,7 +113,7 @@ export default function ScanScreen() {
             <>
               <Text style={styles.drugName}>{drug.name}</Text>
               <Text style={styles.ingredients}>
-                Etken madde: {drug.ingredients.join(', ')}
+                {t('scan.ingredients', { ingredients: drug.ingredients.join(', ') })}
               </Text>
               <PrimaryButton
                 title={`🧪 ${t('scan.test')}`}

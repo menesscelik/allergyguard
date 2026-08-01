@@ -121,6 +121,7 @@ export default function AddReminderScreen() {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
+          automaticallyAdjustKeyboardInsets
           contentContainerStyle={[
             styles.content,
             { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },

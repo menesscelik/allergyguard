@@ -14,6 +14,19 @@ type LocalizationContextValue = {
 const deviceLanguage: AppLanguage = getLocales()[0]?.languageCode === 'en' ? 'en' : 'tr';
 const LocalizationContext = createContext<LocalizationContextValue | null>(null);
 
+function isMissingTranslation(value: string) {
+  return value.startsWith('[missing "') && value.endsWith('" translation]');
+}
+
+function humanizeMissingKey(key: string) {
+  return key
+    .split('.')
+    .at(-1)!
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[_-]/g, ' ')
+    .trim();
+}
+
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const { session } = useAuth();
   const [language, setLanguageState] = useState<AppLanguage>(deviceLanguage);
@@ -46,8 +59,16 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   }, [session]);
 
   const t = useCallback(
-    (key: string, options?: Record<string, unknown>) =>
-      i18n.t(key, { ...options, locale: language }),
+    (key: string, options?: Record<string, unknown>) => {
+      const translated = i18n.t(key, { ...options, locale: language });
+
+      if (!isMissingTranslation(translated)) {
+        return translated;
+      }
+
+      const fallback = i18n.t(key, { ...options, locale: 'tr' });
+      return isMissingTranslation(fallback) ? humanizeMissingKey(key) : fallback;
+    },
     [language]
   );
 

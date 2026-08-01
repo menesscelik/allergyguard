@@ -7,6 +7,8 @@
 create table profiles (
   id            uuid primary key references auth.users(id) on delete cascade,
   full_name     text,
+  username      text,
+  birth_date    date,
   language      text default 'tr',        -- 'tr' | 'en'
   is_premium    boolean default false,
   premium_until timestamptz,
@@ -15,10 +17,19 @@ create table profiles (
 );
 
 -- Her yeni kullanıcıda otomatik profil oluştur (kayıt formundaki ad da gelir)
+create unique index profiles_username_unique_idx
+  on public.profiles (lower(username))
+  where username is not null;
+
 create function handle_new_user() returns trigger as $$
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, new.raw_user_meta_data->>'full_name');
+  insert into public.profiles (id, full_name, username, birth_date)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    nullif(lower(trim(new.raw_user_meta_data->>'username')), ''),
+    nullif(new.raw_user_meta_data->>'birth_date', '')::date
+  );
   return new;
 end;
 $$ language plpgsql security definer set search_path = public;

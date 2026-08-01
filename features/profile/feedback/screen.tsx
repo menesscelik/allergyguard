@@ -6,6 +6,7 @@ import { submitFeedback } from './service';
 import { styles } from './styles';
 
 import { PrimaryButton } from '@/components/form';
+import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
 import type { FeedbackType } from '@/lib/types';
@@ -44,7 +45,9 @@ export default function FeedbackScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={[styles.content, { paddingHorizontal: layout.pagePadding }]}
-        contentInsetAdjustmentBehavior="automatic">
+        automaticallyAdjustKeyboardInsets
+        contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps="handled">
         <View style={[styles.hero, layout.centerContent]}>
           <Text style={styles.badge}>💬</Text>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('feedback.hero')}</Text>
@@ -71,6 +74,7 @@ export default function FeedbackScreen() {
 
           <Text style={styles.label}>{t('feedback.drugName')}</Text>
           <TextInput
+            inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
             value={drugName}
             onChangeText={setDrugName}
             placeholder={t('drugTest.placeholder')}
@@ -80,6 +84,7 @@ export default function FeedbackScreen() {
 
           <Text style={styles.label}>{t('feedback.barcode')}</Text>
           <TextInput
+            inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
             value={barcode}
             onChangeText={setBarcode}
             placeholder="869..."
@@ -90,6 +95,7 @@ export default function FeedbackScreen() {
 
           <Text style={styles.label}>{t('feedback.message')}</Text>
           <TextInput
+            inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
             value={message}
             onChangeText={setMessage}
             placeholder={t('feedback.messagePlaceholder')}

@@ -1,5 +1,5 @@
 import { styles } from './styles';
-import { getAuthPreferences, signIn } from './service';
+import { getAuthPreferences, isAppleSignInAvailable, signIn, signInWithApple, signInWithGoogle } from './service';
 import { Link, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -26,12 +26,15 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
+  const [appleAvailable, setAppleAvailable] = useState(false);
 
   useEffect(() => {
     getAuthPreferences().then((preferences) => {
       setRememberMe(preferences.rememberSession);
       setEmail(preferences.rememberedEmail);
     });
+    isAppleSignInAvailable().then(setAppleAvailable).catch(() => setAppleAvailable(false));
   }, []);
 
   async function handleLogin() {
@@ -50,12 +53,42 @@ export default function LoginScreen() {
     router.replace('/(tabs)' as never);
   }
 
+  async function handleGoogleLogin() {
+    setSocialLoading('google');
+    const result = await signInWithGoogle().catch((error: Error) => ({ data: null, error }));
+    setSocialLoading(null);
+    if ('cancelled' in result && result.cancelled) return;
+    if (result.error) {
+      Alert.alert(t('auth.login.socialFailed'), result.error.message);
+      return;
+    }
+    await onboarding.complete();
+    router.replace('/(tabs)' as never);
+  }
+
+  async function handleAppleLogin() {
+    setSocialLoading('apple');
+    const result = await signInWithApple().catch((error: { code?: string; message: string }) => {
+      if (error.code === 'ERR_REQUEST_CANCELED') return { data: null, error: null, cancelled: true };
+      return { data: null, error };
+    });
+    setSocialLoading(null);
+    if ('cancelled' in result && result.cancelled) return;
+    if (result.error) {
+      Alert.alert(t('auth.login.socialFailed'), result.error.message);
+      return;
+    }
+    await onboarding.complete();
+    router.replace('/(tabs)' as never);
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
+          automaticallyAdjustKeyboardInsets
           contentContainerStyle={[
             styles.container,
             {
@@ -123,6 +156,41 @@ export default function LoginScreen() {
             </View>
 
             <PrimaryButton title={t('auth.login.submit')} onPress={handleLogin} loading={loading} />
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>{t('auth.login.or')}</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <Pressable
+              disabled={Boolean(socialLoading) || loading}
+              onPress={handleGoogleLogin}
+              style={({ pressed }) => [
+                styles.socialButton,
+                (pressed || socialLoading === 'google') && styles.socialButtonPressed,
+              ]}>
+              <Text style={styles.socialIcon}>G</Text>
+              <Text style={styles.socialText}>
+                {socialLoading === 'google' ? t('auth.login.socialLoading') : t('auth.login.google')}
+              </Text>
+            </Pressable>
+
+            {appleAvailable && (
+              <Pressable
+                disabled={Boolean(socialLoading) || loading}
+                onPress={handleAppleLogin}
+                style={({ pressed }) => [
+                  styles.socialButton,
+                  styles.appleButton,
+                  (pressed || socialLoading === 'apple') && styles.socialButtonPressed,
+                ]}>
+                <Text style={styles.appleIcon}></Text>
+                <Text style={styles.appleText}>
+                  {socialLoading === 'apple' ? t('auth.login.socialLoading') : t('auth.login.apple')}
+                </Text>
+              </Pressable>
+            )}
           </View>
 
           <View style={styles.footer}>

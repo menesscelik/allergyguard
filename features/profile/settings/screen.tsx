@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 
 import { notificationsEnabled, setNotificationsEnabled } from './service';
 import { styles } from './styles';
@@ -8,11 +8,14 @@ import { styles } from './styles';
 import { PRIMARY } from '@/components/form';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
+import { useThemePreference, type ThemePreference } from '@/lib/theme-preferences';
 
 export default function SettingsScreen() {
   const { t, language, setLanguage } = useLocalization();
+  const { preference, setPreference } = useThemePreference();
   const layout = useResponsiveLayout();
   const [notifsOn, setNotifsOn] = useState(true);
+  const themeOptions: ThemePreference[] = ['light', 'dark', 'system'];
 
   useEffect(() => {
     notificationsEnabled().then(setNotifsOn);
@@ -59,7 +62,27 @@ export default function SettingsScreen() {
 
         <View style={[styles.card, layout.centerContent]}>
           <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
-          <Text style={styles.systemText}>{t('settings.systemTheme')}</Text>
+          <View style={styles.themeSegment}>
+            {themeOptions.map((option) => {
+              const selected = preference === option;
+
+              return (
+                <Pressable
+                  key={option}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() =>
+                    setPreference(option).catch((error) => Alert.alert(t('common.error'), error.message))
+                  }
+                  style={[styles.themeOption, selected && styles.themeOptionSelected]}>
+                  <Text style={[styles.themeOptionText, selected && styles.themeOptionTextSelected]}>
+                    {t(`settings.theme.${option}`)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text style={styles.systemText}>{t('settings.theme.description')}</Text>
         </View>
       </ScrollView>
     </>

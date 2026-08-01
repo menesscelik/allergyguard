@@ -12,8 +12,8 @@ export const styles = StyleSheet.create({
   },
   introCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16,
-    borderRadius: Radius.xlarge, backgroundColor: Palette.accentSoft,
-    borderWidth: 1, borderColor: Palette.premiumBorder, marginBottom: 20,
+    borderRadius: Radius.xlarge, backgroundColor: Palette.surface,
+    borderWidth: 1, borderColor: Palette.border, marginBottom: 20,
     boxShadow: Shadows.soft,
   },
   introIcon: {
@@ -70,4 +70,3 @@ export const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
-
