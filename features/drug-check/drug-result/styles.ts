@@ -21,10 +21,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'center', backgroundColor: Palette.surface,
   },
   drugEmoji: { fontSize: 27 },
-  heroEyebrow: { color: Palette.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.1 },
+  heroEyebrow: { color: Palette.primary, fontSize: 10, fontWeight: '700', letterSpacing: 1.1 },
   drugName: {
     fontSize: 23,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
     marginTop: 3,
   },
@@ -61,7 +61,7 @@ export const styles = StyleSheet.create({
   },
   riskTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     marginTop: 8,
   },
   resultSummary: {
@@ -83,7 +83,7 @@ export const styles = StyleSheet.create({
   severityAlertTitle: {
     color: Palette.danger,
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '800',
     marginBottom: 6,
   },
   severityAlertText: {
@@ -103,13 +103,13 @@ export const styles = StyleSheet.create({
   },
   scoreValue: {
     fontSize: 24,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   scoreLabel: {
     color: Palette.textMuted,
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '800',
     marginTop: -2,
   },
   detailCard: {
@@ -124,7 +124,7 @@ export const styles = StyleSheet.create({
   detailTitle: {
     color: Palette.text,
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '800',
     marginBottom: 9,
   },
   detailLine: {
@@ -146,7 +146,7 @@ export const styles = StyleSheet.create({
   },
   matchedItem: {
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   explanation: {
     fontSize: 15,
@@ -176,7 +176,7 @@ export const styles = StyleSheet.create({
   methodTitle: {
     color: Palette.primary,
     fontSize: 15,
-    fontWeight: '900',
+    fontWeight: '800',
     marginBottom: 8,
   },
   methodText: {

@@ -6,7 +6,9 @@ import { submitFeedback } from './service';
 import { styles } from './styles';
 
 import { PrimaryButton } from '@/components/form';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
+import { Palette } from '@/constants/theme';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
 import type { FeedbackType } from '@/lib/types';
@@ -49,7 +51,9 @@ export default function FeedbackScreen() {
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled">
         <View style={[styles.hero, layout.centerContent]}>
-          <Text style={styles.badge}>💬</Text>
+          <View style={styles.heroIcon}>
+            <IconSymbol name="bubble.left.fill" size={32} color={Palette.primary} />
+          </View>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('feedback.hero')}</Text>
           <Text style={styles.subtitle}>{t('feedback.subtitle')}</Text>
         </View>

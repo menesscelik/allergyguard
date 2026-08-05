@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 import { Palette, Radius, Shadows } from '@/constants/theme';
-import { PRIMARY } from '@/components/form';
 
 export const styles = StyleSheet.create({
   safe: {
@@ -29,12 +28,12 @@ export const styles = StyleSheet.create({
   eyebrow: {
     color: Palette.primary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 1.2,
   },
   title: {
     fontSize: 29,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
     marginTop: 3,
   },
@@ -86,7 +85,7 @@ export const styles = StyleSheet.create({
   sectionEyebrow: {
     color: Palette.primary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 1.1,
   },
   sectionTitle: {
@@ -126,19 +125,19 @@ export const styles = StyleSheet.create({
   todayValue: {
     color: Palette.primary,
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   todayValueDanger: {
     color: Palette.danger,
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   todayLabel: {
     color: Palette.textSecondary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     marginTop: 2,
   },
   quickAction: {
@@ -173,7 +172,7 @@ export const styles = StyleSheet.create({
   quickTitle: {
     color: Palette.text,
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '700',
     marginTop: 11,
   },
   quickTitlePrimary: {
@@ -196,7 +195,7 @@ export const styles = StyleSheet.create({
   listTitle: {
     color: Palette.text,
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   countPill: {
     minWidth: 30,
@@ -209,7 +208,7 @@ export const styles = StyleSheet.create({
   countText: {
     color: Palette.primary,
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
   list: {
@@ -252,7 +251,7 @@ export const styles = StyleSheet.create({
   drugIconText: {
     color: Palette.primary,
     fontSize: 17,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   cardCopy: {
     flex: 1,
@@ -293,8 +292,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 32,
   },
-  emptyEmoji: {
-    fontSize: 44,
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    backgroundColor: Palette.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   emptyTitle: {
     fontSize: 18,
@@ -309,6 +314,22 @@ export const styles = StyleSheet.create({
     marginTop: 6,
     lineHeight: 20,
   },
+  emptyCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 13,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.primary,
+    boxShadow: Shadows.hero,
+  },
+  emptyCtaText: {
+    color: Palette.white,
+    fontSize: 15,
+    fontWeight: '700',
+  },
   fab: {
     position: 'absolute',
     right: 20,
@@ -316,9 +337,11 @@ export const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: PRIMARY,
+    boxShadow: Shadows.hero,
+  },
+  fabGlass: {
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: Shadows.hero,
   },
 });

@@ -9,11 +9,13 @@ import {
   updateProfile,
 } from './service';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PRIMARY, PrimaryButton } from '@/components/form';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -250,32 +252,52 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/settings' as never)}>
-          <Text style={styles.navTitle}>⚙️ {t('settings.title')}</Text>
-          <Text style={styles.navArrow}>›</Text>
-        </Pressable>
-
-        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/emergency-card' as never)}>
-          <Text style={styles.navTitle}>🆘 {t('emergency.title')}</Text>
-          <Text style={styles.navArrow}>›</Text>
-        </Pressable>
-
-        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/interaction-check' as never)}>
-          <Text style={styles.navTitle}>🔒 {t('interaction.title')}</Text>
-          <Text style={styles.navArrow}>›</Text>
-        </Pressable>
-
-        <Pressable style={[styles.navRow, layout.centerContent]} onPress={() => router.push('/feedback' as never)}>
-          <Text style={styles.navTitle}>💬 {t('feedback.title')}</Text>
-          <Text style={styles.navArrow}>›</Text>
-        </Pressable>
-
-        {profile?.is_admin && (
-          <Pressable style={[styles.adminRow, layout.centerContent]} onPress={() => router.push('/admin' as never)}>
-            <Text style={styles.adminTitle}>🛠️ {t('admin.title')}</Text>
-            <Text style={styles.adminArrow}>›</Text>
-          </Pressable>
-        )}
+        <View style={[styles.navGroup, layout.centerContent]}>
+          <NavRow
+            icon="gearshape.fill"
+            tint={Palette.textSecondary}
+            soft={Palette.surfaceMuted}
+            title={t('settings.title')}
+            onPress={() => router.push('/settings' as never)}
+          />
+          <NavRow
+            icon="clock.arrow.circlepath"
+            tint={Palette.primary}
+            soft={Palette.primarySoft}
+            title={t('history.title')}
+            onPress={() => router.push('/history' as never)}
+          />
+          <NavRow
+            icon="cross.case.fill"
+            tint={Palette.coral}
+            soft={Palette.coralSoft}
+            title={t('emergency.title')}
+            onPress={() => router.push('/emergency-card' as never)}
+          />
+          <NavRow
+            icon="lock.fill"
+            tint={Palette.premium}
+            soft={Palette.premiumSoft}
+            title={t('interaction.title')}
+            onPress={() => router.push('/interaction-check' as never)}
+          />
+          <NavRow
+            icon="bubble.left.fill"
+            tint={Palette.primary}
+            soft={Palette.primarySoft}
+            title={t('feedback.title')}
+            onPress={() => router.push('/feedback' as never)}
+          />
+          {profile?.is_admin && (
+            <NavRow
+              icon="wrench.and.screwdriver.fill"
+              tint={Palette.warning}
+              soft={Palette.warningSoft}
+              title={t('admin.title')}
+              onPress={() => router.push('/admin' as never)}
+            />
+          )}
+        </View>
 
         <Pressable style={[styles.premiumCard, layout.centerContent]} onPress={() => router.push('/premium' as never)}>
           <Text style={styles.premiumTitle}>
@@ -303,6 +325,32 @@ export default function ProfileScreen() {
         </Pressable>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function NavRow({
+  icon,
+  tint,
+  soft,
+  title,
+  onPress,
+}: {
+  icon: ComponentProps<typeof IconSymbol>['name'];
+  tint: string;
+  soft: string;
+  title: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.navRow, pressed && styles.navRowPressed]}>
+      <View style={[styles.navIcon, { backgroundColor: soft }]}>
+        <IconSymbol name={icon} size={16} color={tint} />
+      </View>
+      <Text style={styles.navTitle}>{title}</Text>
+      <IconSymbol name="chevron.right" size={18} color={Palette.textMuted} />
+    </Pressable>
   );
 }
 

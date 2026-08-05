@@ -12,8 +12,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   heroEmoji: { fontSize: 40 },
-  riskTitle: { fontSize: 22, fontWeight: '900', marginTop: 8 },
-  drugName: { color: Palette.text, fontSize: 25, fontWeight: '900', textAlign: 'center', marginTop: 4 },
+  riskTitle: { fontSize: 22, fontWeight: '800', marginTop: 8 },
+  drugName: { color: Palette.text, fontSize: 25, fontWeight: '800', textAlign: 'center', marginTop: 4 },
   date: { color: Palette.textSecondary, fontSize: 12, marginTop: 6 },
   section: {
     padding: 16,
@@ -23,9 +23,9 @@ export const styles = StyleSheet.create({
     borderColor: Palette.border,
     boxShadow: Shadows.soft,
   },
-  sectionTitle: { color: Palette.text, fontSize: 16, fontWeight: '900', marginBottom: 10 },
+  sectionTitle: { color: Palette.text, fontSize: 16, fontWeight: '800', marginBottom: 10 },
   ingredientRow: { flexDirection: 'row', gap: 8, marginBottom: 6 },
-  bullet: { color: Palette.primary, fontWeight: '900' },
+  bullet: { color: Palette.primary, fontWeight: '800' },
   ingredientText: { flex: 1, color: Palette.textSecondary, fontSize: 14, lineHeight: 20 },
   muted: { color: Palette.textMuted, fontSize: 14, lineHeight: 20 },
   matchChip: {
@@ -35,7 +35,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 7,
     marginBottom: 7,
   },
-  matchText: { fontSize: 13, fontWeight: '900' },
+  matchText: { fontSize: 13, fontWeight: '800' },
   bodyText: { color: Palette.textSecondary, fontSize: 15, lineHeight: 22 },
   recommendation: {
     padding: 16,
@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.surface,
     borderWidth: 1.5,
   },
-  recommendationTitle: { color: Palette.text, fontSize: 16, fontWeight: '900', marginBottom: 8 },
+  recommendationTitle: { color: Palette.text, fontSize: 16, fontWeight: '800', marginBottom: 8 },
   timeline: {
     padding: 16,
     borderRadius: Radius.xlarge,
@@ -52,7 +52,7 @@ export const styles = StyleSheet.create({
     borderColor: Palette.border,
     gap: 8,
   },
-  timelineTitle: { color: Palette.primary, fontSize: 15, fontWeight: '900' },
+  timelineTitle: { color: Palette.primary, fontSize: 15, fontWeight: '800' },
   timelineText: { color: Palette.textSecondary, fontSize: 13, lineHeight: 19 },
   disclaimer: { color: Palette.textSecondary, fontSize: 12, lineHeight: 18, textAlign: 'center', marginTop: 4 },
 });

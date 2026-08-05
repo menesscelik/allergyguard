@@ -14,10 +14,10 @@ export const styles = StyleSheet.create({
     boxShadow: Shadows.soft,
     gap: 12,
   },
-  sectionTitle: { color: Palette.text, fontSize: 17, fontWeight: '900' },
+  sectionTitle: { color: Palette.text, fontSize: 17, fontWeight: '800' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   rowCopy: { flex: 1 },
-  rowTitle: { color: Palette.text, fontSize: 15, fontWeight: '800' },
+  rowTitle: { color: Palette.text, fontSize: 15, fontWeight: '700' },
   rowDesc: { color: Palette.textSecondary, fontSize: 12, lineHeight: 18, marginTop: 2 },
   languageOption: {
     padding: 14,
@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Palette.border,
     color: Palette.textSecondary,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   languageOptionSelected: {
     backgroundColor: Palette.primarySoft,
@@ -55,7 +55,7 @@ export const styles = StyleSheet.create({
   themeOptionText: {
     color: Palette.textSecondary,
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   themeOptionTextSelected: {
     color: Palette.white,

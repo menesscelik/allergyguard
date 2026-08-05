@@ -59,9 +59,9 @@ export default function TabLayout() {
           <Label>{t('tabs.test')}</Label>
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="history" role="history">
-          <Icon sf={{ default: 'clock.arrow.circlepath', selected: 'clock.arrow.circlepath' }} drawable="ic_menu_recent_history" />
-          <Label>{t('tabs.history')}</Label>
+        <NativeTabs.Trigger name="family">
+          <Icon sf={{ default: 'person.2', selected: 'person.2.fill' }} drawable="ic_menu_myplaces" />
+          <Label>{t('tabs.family')}</Label>
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="reminders">

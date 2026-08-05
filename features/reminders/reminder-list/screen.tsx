@@ -1,10 +1,12 @@
 import { styles } from './styles';
 import {
   deleteReminder,
+  getAdherenceStats,
   listReminders,
   listTodayIntakeLogs,
   markReminderIntake,
   setReminderActive,
+  type AdherenceStats,
 } from './service';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
@@ -16,11 +18,13 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 
+import { AnimatedCounter } from '@/components/animated-counter';
 import { PRIMARY } from '@/components/form';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { hapticLight, hapticSuccess } from '@/lib/haptics';
 import { Palette } from '@/constants/theme';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -41,20 +45,25 @@ function formatDays(days: number[], labels: string[], everyDay: string): string 
 export default function RemindersScreen() {
   const { t, language } = useLocalization();
   const layout = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
+  const tabBarClearance = Math.max(insets.bottom, 8) + 72;
   const dayLabels = language === 'tr'
     ? ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
     : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [todayLogs, setTodayLogs] = useState<MedicationIntakeLog[]>([]);
+  const [stats, setStats] = useState<AdherenceStats>({ streak: 0, adherence: null, taken: 0, skipped: 0 });
   const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
-    const [{ data, error }, logsResult] = await Promise.all([
+    const [{ data, error }, logsResult, statsResult] = await Promise.all([
       listReminders(),
       listTodayIntakeLogs(),
+      getAdherenceStats().catch(() => null),
     ]);
     if (!error && data) setReminders(data as Reminder[]);
     if (!logsResult.error && logsResult.data) setTodayLogs(logsResult.data);
+    if (statsResult) setStats(statsResult);
     setLoaded(true);
   }, []);
 
@@ -110,6 +119,8 @@ export default function RemindersScreen() {
   }
 
   async function markIntake(item: Reminder, status: IntakeStatus) {
+    if (status === 'taken') hapticSuccess();
+    else hapticLight();
     const previous = todayLogs;
     const optimisticLog: MedicationIntakeLog = {
       id: `${item.id}-${status}`,
@@ -152,9 +163,35 @@ export default function RemindersScreen() {
           <Text style={styles.subtitle}>{t('reminders.subtitle')}</Text>
         </View>
         <View style={[styles.clockBadge, { width: layout.badgeSize, height: layout.badgeSize }]}>
-          <Text style={styles.clockEmoji}>⏰</Text>
+          <IconSymbol name="alarm.fill" size={28} color={Palette.warning} />
         </View>
       </View>
+
+      {loaded && stats.taken + stats.skipped > 0 && (
+        <View style={[styles.statsCard, { marginHorizontal: layout.pagePadding }]}>
+          <View style={styles.statItem}>
+            <View style={styles.statValueRow}>
+              <IconSymbol name="flame.fill" size={20} color={Palette.warning} />
+              <AnimatedCounter value={stats.streak} style={styles.statValue} />
+            </View>
+            <Text style={styles.statLabel}>{t('reminders.stats.streak')}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            {stats.adherence != null ? (
+              <AnimatedCounter value={stats.adherence} prefix="%" style={[styles.statValue, { color: Palette.success }]} />
+            ) : (
+              <Text style={[styles.statValue, { color: Palette.success }]}>—</Text>
+            )}
+            <Text style={styles.statLabel}>{t('reminders.stats.adherence')}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <AnimatedCounter value={stats.taken} style={styles.statValue} />
+            <Text style={styles.statLabel}>{t('reminders.stats.taken')}</Text>
+          </View>
+        </View>
+      )}
 
       <View
         style={[
@@ -181,7 +218,13 @@ export default function RemindersScreen() {
       <FlatList
         data={reminders}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[styles.list, { paddingHorizontal: layout.pagePadding }]}
+        contentContainerStyle={[
+          styles.list,
+          {
+            paddingHorizontal: layout.pagePadding,
+            paddingBottom: tabBarClearance + 76,
+          },
+        ]}
         renderItem={({ item, index }) => (
           <Animated.View
             entering={FadeInDown.duration(220).delay(Math.min(index, 8) * 35)}
@@ -193,7 +236,11 @@ export default function RemindersScreen() {
               }
               onLongPress={() => confirmDelete(item)}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.time}>{formatTime(item.remind_time)}</Text>
+                <Text style={styles.time}>
+                  {(item.remind_times?.length ? item.remind_times : [item.remind_time])
+                    .map(formatTime)
+                    .join('  ·  ')}
+                </Text>
                 <Text style={styles.drugName}>{item.drug_name}</Text>
                 <Text style={styles.days}>{formatDays(item.repeat_days, dayLabels, t('reminders.everyday'))}</Text>
                 {!!item.notes && <Text style={styles.notes}>{item.notes}</Text>}
@@ -238,7 +285,9 @@ export default function RemindersScreen() {
         ListEmptyComponent={
           loaded ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyEmoji}>⏰</Text>
+              <View style={styles.emptyIcon}>
+                <IconSymbol name="alarm.fill" size={32} color={Palette.warning} />
+              </View>
               <Text style={styles.emptyTitle}>{t('reminders.emptyTitle')}</Text>
               <Text style={styles.emptyText}>{t('reminders.emptyText')}</Text>
             </View>
@@ -246,7 +295,9 @@ export default function RemindersScreen() {
         }
       />
 
-      <Pressable style={styles.fab} onPress={() => router.push('/add-reminder')}>
+      <Pressable
+        style={[styles.fab, { bottom: tabBarClearance }]}
+        onPress={() => router.push('/add-reminder')}>
         <IconSymbol name="plus" size={28} color={Palette.white} />
       </Pressable>
     </SafeAreaView>

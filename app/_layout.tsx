@@ -6,13 +6,17 @@ import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
+import { ErrorBoundary } from '@/components/error-boundary';
 import { NavigationBackButton } from '@/components/navigation-back-button';
 import { KeyboardDismissAccessory } from '@/components/keyboard-dismiss-accessory';
 import { Palette } from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/lib/auth-context';
 import { LocalizationProvider, useLocalization } from '@/lib/localization-context';
+import { initMonitoring } from '@/lib/monitoring';
 import { OnboardingProvider, useOnboarding } from '@/lib/onboarding-context';
 import { ThemePreferenceProvider, useThemePreference } from '@/lib/theme-preferences';
+
+initMonitoring();
 
 export const unstable_settings = {
   anchor: '(auth)',
@@ -38,20 +42,22 @@ function RootNavigator() {
       return;
     }
 
-    if (!isAuthenticated) {
-      if (!PUBLIC_AUTH_PATHS.has(pathname)) {
-        router.replace('/(auth)/login' as never);
-      }
-      return;
-    }
-
+    // Şifre sıfırlama derin bağlantıları her şeyin önünde geçer.
     if (PASSWORD_RESET_PATHS.has(pathname)) {
       return;
     }
 
+    // İlk açılış: tanıtım henüz görülmediyse önce onu göster (giriş öncesi).
     if (!onboarding.seen) {
       if (pathname !== '/onboarding') {
         router.replace('/onboarding' as never);
+      }
+      return;
+    }
+
+    if (!isAuthenticated) {
+      if (!PUBLIC_AUTH_PATHS.has(pathname)) {
+        router.replace('/(auth)/login' as never);
       }
       return;
     }
@@ -69,6 +75,16 @@ function RootNavigator() {
     );
   }
 
+  // Tanıtım (onboarding) ilk açılışta, giriş ekranından ÖNCE gösterilir.
+  // Şifre sıfırlama derin bağlantıları bu kapıdan muaftır.
+  if (!onboarding.seen && !PASSWORD_RESET_PATHS.has(pathname)) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+      </Stack>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <Stack
@@ -79,6 +95,7 @@ function RootNavigator() {
           headerTintColor: Palette.primary,
           headerTitleStyle: { color: Palette.text, fontWeight: '900' },
           headerShadowVisible: false,
+          headerBackVisible: false,
           headerStyle: { backgroundColor: Palette.background },
           headerLeft: () => <NavigationBackButton fallback="/(auth)/login" />,
         }}>
@@ -93,14 +110,6 @@ function RootNavigator() {
     );
   }
 
-  if (!onboarding.seen) {
-    return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-      </Stack>
-    );
-  }
-
   return (
     <Stack
       screenOptions={{
@@ -109,6 +118,7 @@ function RootNavigator() {
         headerTintColor: Palette.primary,
         headerTitleStyle: { color: Palette.text, fontWeight: '900' },
         headerShadowVisible: false,
+        headerBackVisible: false,
         headerStyle: { backgroundColor: Palette.background },
         headerLeft: () => <NavigationBackButton fallback="/(tabs)" />,
       }}>
@@ -125,6 +135,8 @@ function RootNavigator() {
       <Stack.Screen name="emergency-card" options={{ headerShown: true, title: t('emergency.title') }} />
       <Stack.Screen name="interaction-check" options={{ headerShown: true, title: t('interaction.title') }} />
       <Stack.Screen name="feedback" options={{ headerShown: true, title: t('feedback.title') }} />
+      <Stack.Screen name="history" options={{ headerShown: true, title: t('tabs.history') }} />
+      <Stack.Screen name="family-member" options={{ headerShown: true, title: t('family.memberTitle') }} />
       <Stack.Screen name="admin" options={{ headerShown: true, title: t('admin.title') }} />
       <Stack.Screen name="scan" options={{ headerShown: true, title: t('scan.title') }} />
       <Stack.Screen
@@ -174,10 +186,12 @@ function AppShell() {
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemePreferenceProvider>
-        <AppShell />
-      </ThemePreferenceProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemePreferenceProvider>
+          <AppShell />
+        </ThemePreferenceProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

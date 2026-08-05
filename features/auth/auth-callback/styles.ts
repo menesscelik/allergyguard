@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
   title: {
     color: Palette.textSecondary,
     fontSize: 15,
-    fontWeight: '800',
+    fontWeight: '700',
     textAlign: 'center',
   },
 });

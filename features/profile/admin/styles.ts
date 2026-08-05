@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     boxShadow: Shadows.soft,
   },
   badge: { fontSize: 34, marginBottom: 8 },
-  title: { color: Palette.text, fontWeight: '900' },
+  title: { color: Palette.text, fontWeight: '800' },
   subtitle: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20, marginTop: 6 },
   lockCard: {
     borderRadius: Radius.xlarge,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     gap: 10,
   },
   lockIcon: { fontSize: 32 },
-  lockTitle: { color: Palette.text, fontSize: 18, fontWeight: '900' },
+  lockTitle: { color: Palette.text, fontSize: 18, fontWeight: '800' },
   lockText: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20 },
   card: {
     borderRadius: Radius.xlarge,
@@ -62,19 +62,19 @@ export const styles = StyleSheet.create({
   statValue: {
     color: Palette.primary,
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   statValuePremium: {
     color: Palette.premium,
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   statLabel: {
     color: Palette.textSecondary,
     fontSize: 10,
-    fontWeight: '900',
+    fontWeight: '800',
     marginTop: 3,
   },
   sectionHeader: {
@@ -83,7 +83,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
-  sectionTitle: { color: Palette.text, fontSize: 18, fontWeight: '900' },
+  sectionTitle: { color: Palette.text, fontSize: 18, fontWeight: '800' },
   helperText: {
     color: Palette.textSecondary,
     fontSize: 13,
@@ -100,9 +100,9 @@ export const styles = StyleSheet.create({
   generateText: {
     color: Palette.premium,
     fontSize: 12,
-    fontWeight: '900',
+    fontWeight: '800',
   },
-  label: { color: Palette.textSecondary, fontSize: 12, fontWeight: '900', marginTop: 4 },
+  label: { color: Palette.textSecondary, fontSize: 12, fontWeight: '800', marginTop: 4 },
   input: {
     borderRadius: Radius.large,
     borderWidth: 1,
@@ -122,7 +122,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 18,
-    fontWeight: '900',
+    fontWeight: '800',
     letterSpacing: 1.2,
     textAlign: 'center',
   },
@@ -153,12 +153,12 @@ export const styles = StyleSheet.create({
   adminActionText: {
     color: Palette.success,
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   adminActionTextDanger: {
     color: Palette.danger,
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   disabledButton: {
     opacity: 0.5,
@@ -179,7 +179,7 @@ export const styles = StyleSheet.create({
   filterText: {
     color: Palette.textSecondary,
     fontSize: 12,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   filterTextSelected: {
     color: Palette.white,
@@ -195,7 +195,7 @@ export const styles = StyleSheet.create({
     borderTopColor: Palette.border,
   },
   codeCopy: { flex: 1, minWidth: 0 },
-  codeText: { color: Palette.text, fontSize: 16, fontWeight: '900', letterSpacing: 0.8 },
+  codeText: { color: Palette.text, fontSize: 16, fontWeight: '800', letterSpacing: 0.8 },
   codeDescription: { color: Palette.textSecondary, fontSize: 12, marginTop: 3, fontWeight: '700' },
   codeMeta: { color: Palette.textSecondary, fontSize: 12, marginTop: 3 },
   codeActions: {
@@ -209,7 +209,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.successSoft,
   },
   statusPillOff: { backgroundColor: Palette.surfaceMuted },
-  statusText: { color: Palette.success, fontSize: 11, fontWeight: '900' },
+  statusText: { color: Palette.success, fontSize: 11, fontWeight: '800' },
   statusTextOff: { color: Palette.textMuted },
   statusButton: {
     borderRadius: Radius.pill,
@@ -226,7 +226,7 @@ export const styles = StyleSheet.create({
   statusButtonText: {
     color: Palette.danger,
     fontSize: 11,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   statusButtonTextOn: {
     color: Palette.success,

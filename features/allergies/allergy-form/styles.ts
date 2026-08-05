@@ -27,10 +27,10 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Palette.surface,
+    backgroundColor: Palette.primarySoft,
   },
   introEmoji: { fontSize: 25 },
-  introTitle: { color: Palette.text, fontSize: 17, fontWeight: '800' },
+  introTitle: { color: Palette.text, fontSize: 17, fontWeight: '700' },
   introText: { color: Palette.textSecondary, fontSize: 11, lineHeight: 16, marginTop: 3 },
   scanButton: {
     borderWidth: 1.5,

@@ -1,5 +1,6 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Stack, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import {
@@ -13,8 +14,9 @@ import {
 } from './service';
 import { styles } from './styles';
 
-import { PrimaryButton } from '@/components/form';
 import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
+import { Palette } from '@/constants/theme';
+import { captureException } from '@/lib/monitoring';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -24,11 +26,13 @@ export default function PremiumScreen() {
   const { t, language } = useLocalization();
   const layout = useResponsiveLayout();
   const [promoCode, setPromoCode] = useState('');
+  const [showPromo, setShowPromo] = useState(false);
   const [redeeming, setRedeeming] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [purchasingProductId, setPurchasingProductId] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(false);
   const [products, setProducts] = useState<AdaptyPaywallProduct[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [productError, setProductError] = useState<string | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [premiumUntil, setPremiumUntil] = useState<string | null>(null);
@@ -69,11 +73,17 @@ export default function PremiumScreen() {
     loadStoreProducts(session.user.id)
       .then((nextProducts) => {
         if (!mounted) return;
-        setProducts(sortProducts(nextProducts));
+        const sorted = sortProducts(nextProducts);
+        setProducts(sorted);
+        // Apple paywall default: preselect the best-value (yearly) plan.
+        const featured = sorted.find(isYearlyProduct) ?? sorted[0];
+        setSelectedProductId(featured?.vendorProductId ?? null);
       })
       .catch((error: Error) => {
         if (!mounted) return;
-        setProductError(error.message);
+        // Ham mağaza/Adapty hatasını kullanıcıya gösterme; yalnızca izleme için logla.
+        captureException(error, { scope: 'loadStoreProducts' });
+        setProductError(t('premium.purchase.unavailable'));
         setProducts([]);
       })
       .finally(() => {
@@ -85,6 +95,12 @@ export default function PremiumScreen() {
       mounted = false;
     };
   }, [session]);
+
+  const monthlyProduct = useMemo(() => products.find((p) => !isYearlyProduct(p)), [products]);
+  const selectedProduct = useMemo(
+    () => products.find((p) => p.vendorProductId === selectedProductId) ?? null,
+    [products, selectedProductId],
+  );
 
   function formatPremiumUntil(value: string | null) {
     if (!value) return t('premium.activeLifetime');
@@ -100,6 +116,36 @@ export default function PremiumScreen() {
     } catch {
       return date.toLocaleDateString();
     }
+  }
+
+  function formatMoney(amount: number, product: AdaptyPaywallProduct) {
+    const code = product.price?.currencyCode;
+    if (code) {
+      try {
+        return new Intl.NumberFormat(language === 'tr' ? 'tr-TR' : 'en-US', {
+          style: 'currency',
+          currency: code,
+        }).format(amount);
+      } catch {
+        // fall through
+      }
+    }
+    const symbol = product.price?.currencySymbol ?? '';
+    return `${symbol}${amount.toFixed(2)}`;
+  }
+
+  function monthlyEquivalent(product: AdaptyPaywallProduct) {
+    const amount = product.price?.amount;
+    if (!isYearlyProduct(product) || !amount) return null;
+    return `${formatMoney(amount / 12, product)}/${t('premium.purchase.perMonthShort')}`;
+  }
+
+  function savingsPercent(product: AdaptyPaywallProduct) {
+    const yearly = product.price?.amount;
+    const monthly = monthlyProduct?.price?.amount;
+    if (!isYearlyProduct(product) || !yearly || !monthly) return null;
+    const percent = Math.round((1 - yearly / 12 / monthly) * 100);
+    return percent > 0 ? percent : null;
   }
 
   async function handleRedeem() {
@@ -134,8 +180,8 @@ export default function PremiumScreen() {
     );
   }
 
-  async function handlePurchase(product: AdaptyPaywallProduct) {
-    if (!session) return;
+  async function handlePurchase(product: AdaptyPaywallProduct | null) {
+    if (!session || !product) return;
 
     setPurchasingProductId(product.vendorProductId);
     const result = await buyStoreProduct(product, session.user.id).catch((error: Error) => {
@@ -172,6 +218,8 @@ export default function PremiumScreen() {
     Alert.alert(t('premium.purchase.restoredTitle'), t('premium.purchase.restoredText'));
   }
 
+  const busy = Boolean(purchasingProductId) || restoring;
+
   return (
     <>
       <Stack.Screen options={{ title: t('premium.title') }} />
@@ -181,101 +229,174 @@ export default function PremiumScreen() {
         automaticallyAdjustKeyboardInsets
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled">
-        <View style={[styles.hero, layout.centerContent, { padding: layout.heroPadding }]}>
-          <Text style={styles.badge}>⭐</Text>
+        {/* Hero */}
+        <View style={[styles.hero, layout.centerContent]}>
+          <View style={styles.heroIcon}>
+            <MaterialIcons name="workspace-premium" size={40} color={Palette.white} />
+          </View>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('premium.hero')}</Text>
           <Text style={styles.subtitle}>{t('premium.subtitle')}</Text>
-          <View style={styles.pricePill}>
-            <Text style={styles.price}>
-              {isPremium ? t('premium.active') : t('premium.price')}
-            </Text>
-          </View>
           {isPremium && (
-            <Text style={styles.activeUntil}>
-              {t('premium.activeUntil', { date: formatPremiumUntil(premiumUntil) })}
-            </Text>
+            <View style={styles.activePill}>
+              <MaterialIcons name="check-circle" size={15} color={Palette.premium} />
+              <Text style={styles.activePillText}>
+                {t('premium.activeUntil', { date: formatPremiumUntil(premiumUntil) })}
+              </Text>
+            </View>
           )}
         </View>
 
+        {/* Features */}
         <View style={[styles.featureCard, layout.centerContent]}>
           {premiumFeatures().map((key) => (
             <View key={key} style={styles.featureRow}>
-              <Text style={styles.featureIcon}>✓</Text>
+              <View style={styles.featureIcon}>
+                <MaterialIcons name="check" size={15} color={Palette.premium} />
+              </View>
               <Text style={styles.featureText}>{t(key)}</Text>
             </View>
           ))}
         </View>
 
-        <View style={[styles.storeCard, layout.centerContent]}>
-          <Text style={styles.promoTitle}>{t('premium.purchase.title')}</Text>
-          <Text style={styles.promoText}>
-            {loadingProducts ? t('premium.purchase.loading') : t('premium.purchase.subtitle')}
-          </Text>
+        {/* Plans + CTA */}
+        {!isPremium && (
+          <View style={[layout.centerContent, styles.plansSection]}>
+            <Text style={styles.sectionTitle}>{t('premium.purchase.title')}</Text>
 
-          {products.length === 0 && !loadingProducts ? (
-            <View style={styles.emptyProducts}>
-              <Text style={styles.emptyProductsText}>{t('premium.purchase.empty')}</Text>
-              {productError ? (
-                <Text style={styles.emptyProductsHint}>{productError}</Text>
-              ) : null}
-            </View>
-          ) : (
-            products.map((product) => (
-              <Pressable
-                key={product.vendorProductId}
-                disabled={Boolean(purchasingProductId) || restoring}
-                onPress={() => handlePurchase(product)}
-                style={({ pressed }) => [
-                  styles.productRow,
-                  isYearlyProduct(product) && styles.productRowFeatured,
-                  pressed && styles.productRowPressed,
-                ]}>
-                <View style={styles.productCopy}>
-                  <Text style={styles.productTitle}>
-                    {isYearlyProduct(product) ? t('premium.purchase.yearly') : t('premium.purchase.monthly')}
+            {loadingProducts ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>{t('premium.purchase.loading')}</Text>
+              </View>
+            ) : products.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyText}>{t('premium.purchase.empty')}</Text>
+                {productError ? <Text style={styles.emptyHint}>{productError}</Text> : null}
+              </View>
+            ) : (
+              <View style={styles.planList}>
+                {products.map((product) => {
+                  const selected = product.vendorProductId === selectedProductId;
+                  const featured = isYearlyProduct(product);
+                  const percent = savingsPercent(product);
+                  const perMonth = monthlyEquivalent(product);
+                  return (
+                    <Pressable
+                      key={product.vendorProductId}
+                      disabled={busy}
+                      onPress={() => setSelectedProductId(product.vendorProductId)}
+                      style={[
+                        styles.planCard,
+                        featured && styles.planCardFeatured,
+                        selected && styles.planCardSelected,
+                      ]}>
+                      {featured && (
+                        <View style={styles.badge}>
+                          <Text style={styles.badgeText}>
+                            {percent
+                              ? t('premium.purchase.save', { percent: `%${percent}` })
+                              : t('premium.purchase.bestValue')}
+                          </Text>
+                        </View>
+                      )}
+                      <View style={[styles.radio, selected && styles.radioSelected]}>
+                        {selected && <MaterialIcons name="check" size={14} color={Palette.white} />}
+                      </View>
+                      <View style={styles.planInfo}>
+                        <Text style={styles.planName}>
+                          {featured ? t('premium.purchase.yearly') : t('premium.purchase.monthly')}
+                        </Text>
+                        <Text style={styles.planMeta}>
+                          {featured ? t('premium.purchase.billedYearly') : t('premium.purchase.billedMonthly')}
+                        </Text>
+                      </View>
+                      <View style={styles.planPriceCol}>
+                        <Text style={styles.planPrice}>{product.price?.localizedString ?? '—'}</Text>
+                        {perMonth ? <Text style={styles.planPricePer}>{perMonth}</Text> : null}
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+
+            {products.length > 0 && (
+              <>
+                <Pressable
+                  disabled={busy || !selectedProduct}
+                  onPress={() => handlePurchase(selectedProduct)}
+                  style={({ pressed }) => [
+                    styles.cta,
+                    (busy || !selectedProduct) && styles.ctaDisabled,
+                    pressed && styles.ctaPressed,
+                  ]}>
+                  <Text style={styles.ctaText}>
+                    {purchasingProductId
+                      ? t('premium.purchase.purchasing')
+                      : t('premium.purchase.subscribe')}
                   </Text>
-                  <Text style={styles.productSubtitle}>
-                    {product.subscription?.localizedSubscriptionPeriod ?? product.localizedDescription}
-                  </Text>
+                </Pressable>
+
+                <View style={styles.securedRow}>
+                  <MaterialIcons name="lock" size={13} color={Palette.textMuted} />
+                  <Text style={styles.securedText}>{t('premium.purchase.securedByApple')}</Text>
                 </View>
-                <Text style={styles.productPrice}>
-                  {purchasingProductId === product.vendorProductId
-                    ? t('premium.purchase.purchasing')
-                    : product.price?.localizedString ?? '—'}
+              </>
+            )}
+
+            <Pressable disabled={busy} onPress={handleRestore} style={styles.restoreButton}>
+              <Text style={styles.restoreButtonText}>
+                {restoring ? t('premium.purchase.restoring') : t('premium.purchase.restore')}
+              </Text>
+            </Pressable>
+          </View>
+        )}
+
+        {/* Promo code (secondary) */}
+        <View style={[styles.promoCard, layout.centerContent]}>
+          <Pressable
+            onPress={() => setShowPromo((v) => !v)}
+            style={styles.promoHeader}>
+            <View style={styles.promoHeaderText}>
+              <Text style={styles.promoTitle}>{t('premium.promo.title')}</Text>
+              <Text style={styles.promoText}>{t('premium.promo.subtitle')}</Text>
+            </View>
+            <MaterialIcons
+              name={showPromo ? 'expand-less' : 'expand-more'}
+              size={24}
+              color={Palette.textMuted}
+            />
+          </Pressable>
+
+          {showPromo && (
+            <>
+              <TextInput
+                inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
+                value={promoCode}
+                onChangeText={(value) => setPromoCode(value.toUpperCase())}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                placeholder={t('premium.promo.placeholder')}
+                placeholderTextColor={Palette.textMuted}
+                style={styles.promoInput}
+              />
+              <Pressable
+                disabled={redeeming}
+                onPress={handleRedeem}
+                style={({ pressed }) => [
+                  styles.promoButton,
+                  redeeming && styles.ctaDisabled,
+                  pressed && styles.ctaPressed,
+                ]}>
+                <Text style={styles.promoButtonText}>
+                  {redeeming ? t('premium.promo.activating') : t('premium.promo.activate')}
                 </Text>
               </Pressable>
-            ))
+            </>
           )}
-
-          <Pressable disabled={restoring || Boolean(purchasingProductId)} onPress={handleRestore} style={styles.restoreButton}>
-            <Text style={styles.restoreButtonText}>
-              {restoring ? t('premium.purchase.restoring') : t('premium.purchase.restore')}
-            </Text>
-          </Pressable>
-        </View>
-
-        <View style={[styles.promoCard, layout.centerContent]}>
-          <Text style={styles.promoTitle}>{t('premium.promo.title')}</Text>
-          <Text style={styles.promoText}>{t('premium.promo.subtitle')}</Text>
-          <TextInput
-            inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
-            value={promoCode}
-            onChangeText={(value) => setPromoCode(value.toUpperCase())}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            placeholder={t('premium.promo.placeholder')}
-            placeholderTextColor="#9CA3AF"
-            style={styles.promoInput}
-          />
-          <PrimaryButton
-            title={redeeming ? t('premium.promo.activating') : t('premium.promo.activate')}
-            onPress={handleRedeem}
-            loading={redeeming}
-          />
         </View>
 
         <View style={layout.centerContent}>
-          <Text style={styles.note}>{t('premium.note')}</Text>
+          <Text style={styles.note}>{t('premium.purchase.terms')}</Text>
         </View>
       </ScrollView>
     </>

@@ -14,6 +14,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 
+import { LiquidGlass } from '@/components/liquid-glass';
+import { SkeletonCard } from '@/components/skeleton';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
@@ -114,10 +116,16 @@ export default function AllergiesScreen() {
             </View>
             <Pressable
               hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.drug_name} — ${t('allergies.editTitle')}`}
               onPress={() => router.push({ pathname: '/add-allergy', params: { id: item.id } })}>
               <IconSymbol name="pencil" size={18} color={Palette.textMuted} />
             </Pressable>
-            <Pressable hitSlop={8} onPress={() => confirmDelete(item)}>
+            <Pressable
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.drug_name} — ${t('common.delete')}`}
+              onPress={() => confirmDelete(item)}>
               <IconSymbol name="trash" size={18} color={Palette.textMuted} />
             </Pressable>
           </View>
@@ -165,7 +173,7 @@ export default function AllergiesScreen() {
                 </View>
               </View>
               <View style={[styles.shieldBadge, { width: layout.badgeSize, height: layout.badgeSize }]}>
-                <Text style={styles.shieldEmoji}>🛡️</Text>
+                <IconSymbol name="shield.checkered" size={30} color={Palette.primary} />
               </View>
             </View>
 
@@ -242,16 +250,36 @@ export default function AllergiesScreen() {
         ListEmptyComponent={
           loaded ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyEmoji}>🩺</Text>
+              <View style={styles.emptyIcon}>
+                <IconSymbol name="cross.case.fill" size={34} color={Palette.primary} />
+              </View>
               <Text style={styles.emptyTitle}>{t('allergies.emptyTitle')}</Text>
               <Text style={styles.emptyText}>{t('allergies.emptyText')}</Text>
+              <Pressable
+                style={({ pressed }) => [styles.emptyCta, pressed && { opacity: 0.85 }]}
+                onPress={() => router.push('/add-allergy')}>
+                <IconSymbol name="plus" size={18} color={Palette.white} />
+                <Text style={styles.emptyCtaText}>{t('allergies.emptyCta')}</Text>
+              </Pressable>
             </View>
-          ) : null
+          ) : (
+            <View style={{ paddingTop: 8 }}>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </View>
+          )
         }
       />
 
-      <Pressable style={styles.fab} onPress={() => router.push('/add-allergy')}>
-        <IconSymbol name="plus" size={28} color={Palette.white} />
+      <Pressable
+        style={styles.fab}
+        accessibilityRole="button"
+        accessibilityLabel={t('allergies.addTitle')}
+        onPress={() => router.push('/add-allergy')}>
+        <LiquidGlass interactive radius={28} tintColor={Palette.primary} style={styles.fabGlass}>
+          <IconSymbol name="plus" size={28} color={Palette.white} />
+        </LiquidGlass>
       </Pressable>
     </SafeAreaView>
   );

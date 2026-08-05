@@ -32,7 +32,9 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "İlaç kutusundaki barkodu okumak için kamera erişimi gerekiyor."
+          "cameraPermission": "İlaç kutusundaki barkodu okumak için kamera erişimi gerekiyor.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ],
       [

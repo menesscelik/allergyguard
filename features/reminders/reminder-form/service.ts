@@ -8,6 +8,7 @@ export function getReminder(id: string) {
 type ReminderPayload = {
   drug_name: string;
   remind_time: string;
+  remind_times: string[];
   repeat_days: number[];
   notes: string | null;
   is_active: boolean;

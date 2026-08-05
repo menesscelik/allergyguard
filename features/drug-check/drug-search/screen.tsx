@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
@@ -91,7 +92,7 @@ export default function DrugTestScreen() {
             <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('drugTest.title')}</Text>
           </View>
           <View style={[styles.labBadge, { width: layout.badgeSize, height: layout.badgeSize }]}>
-            <Text style={styles.labEmoji}>🧪</Text>
+            <IconSymbol name="pills.fill" size={28} color={Palette.primary} />
           </View>
         </View>
         <Text style={styles.subtitle}>{t('drugTest.subtitle')}</Text>
@@ -152,7 +153,9 @@ export default function DrugTestScreen() {
             </View>
           ) : results === null && !loading ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyEmoji}>🔍</Text>
+              <View style={styles.emptyIcon}>
+                <IconSymbol name="magnifyingglass" size={32} color={Palette.primary} />
+              </View>
               <Text style={styles.emptyText}>{t('drugTest.empty')}</Text>
             </View>
           ) : null

@@ -14,8 +14,7 @@ export default function AuthLayout() {
         options={{
           headerShown: true,
           title: t('auth.register.title'),
-          headerBackTitle: 'Geri',
-          headerBackButtonDisplayMode: 'default',
+          headerBackVisible: false,
           headerLeft: () => <NavigationBackButton fallback="/(auth)/login" />,
           headerShadowVisible: false,
           headerStyle: { backgroundColor: Palette.background },
@@ -28,6 +27,7 @@ export default function AuthLayout() {
         options={{
           headerShown: true,
           title: t('auth.forgot.title'),
+          headerBackVisible: false,
           headerLeft: () => <NavigationBackButton fallback="/(auth)/login" />,
           headerShadowVisible: false,
           headerStyle: { backgroundColor: Palette.background },

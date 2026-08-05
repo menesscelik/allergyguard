@@ -14,6 +14,8 @@ import {
 } from 'react-native';
 
 import { FormInput, PrimaryButton } from '@/components/form';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -30,6 +32,10 @@ function dateToTime(d: Date): string {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
 }
 
+function timeLabel(t: string): string {
+  return t.slice(0, 5); // "08:30:00" -> "08:30"
+}
+
 export default function AddReminderScreen() {
   const { session } = useAuth();
   const { t, language } = useLocalization();
@@ -41,7 +47,8 @@ export default function AddReminderScreen() {
   const isEdit = !!id;
 
   const [drugName, setDrugName] = useState('');
-  const [time, setTime] = useState(() => timeToDate('08:30:00'));
+  const [times, setTimes] = useState<string[]>(['08:30:00']);
+  const [draft, setDraft] = useState(() => timeToDate('08:30:00'));
   const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
@@ -56,7 +63,8 @@ export default function AddReminderScreen() {
           return;
         }
         setDrugName(data.drug_name);
-        setTime(timeToDate(data.remind_time));
+        const loadedTimes: string[] = data.remind_times?.length ? data.remind_times : [data.remind_time];
+        setTimes([...loadedTimes].sort());
         setDays(data.repeat_days ?? [1, 2, 3, 4, 5, 6, 7]);
         setNotes(data.notes ?? '');
       });
@@ -68,9 +76,22 @@ export default function AddReminderScreen() {
     );
   }
 
+  function addTime() {
+    const value = dateToTime(draft);
+    setTimes((prev) => (prev.includes(value) ? prev : [...prev, value].sort()));
+  }
+
+  function removeTime(value: string) {
+    setTimes((prev) => prev.filter((v) => v !== value));
+  }
+
   async function handleSave() {
     if (!drugName.trim()) {
       Alert.alert(t('common.error'), t('allergies.drugName'));
+      return;
+    }
+    if (times.length === 0) {
+      Alert.alert(t('common.error'), t('reminders.times'));
       return;
     }
     if (days.length === 0) {
@@ -79,9 +100,11 @@ export default function AddReminderScreen() {
     }
     setSaving(true);
 
+    const sortedTimes = [...times].sort();
     const payload = {
       drug_name: drugName.trim(),
-      remind_time: dateToTime(time),
+      remind_time: sortedTimes[0],
+      remind_times: sortedTimes,
       repeat_days: [...days].sort((a, b) => a - b),
       notes: notes.trim() || null,
       is_active: true,
@@ -129,7 +152,7 @@ export default function AddReminderScreen() {
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled">
           <View style={[styles.introCard, layout.centerContent, { padding: layout.heroPadding }]}>
-            <View style={styles.introIcon}><Text style={styles.introEmoji}>⏰</Text></View>
+            <View style={styles.introIcon}><IconSymbol name="alarm.fill" size={24} color={Palette.warning} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.introTitle}>{t('reminders.title')}</Text>
               <Text style={styles.introText}>{t('reminders.subtitle')}</Text>
@@ -145,16 +168,37 @@ export default function AddReminderScreen() {
           </View>
 
           <View style={layout.centerContent}>
-            <Text style={styles.label}>{t('reminders.time')}</Text>
+            <Text style={styles.label}>
+              {t('reminders.times')} {times.length > 0 ? `(${t('reminders.timesCount', { count: times.length })})` : ''}
+            </Text>
           </View>
-          <View style={[styles.timePicker, layout.centerContent]}>
+
+          {times.length > 0 && (
+            <View style={[styles.timeChips, layout.centerContent]}>
+              {[...times].sort().map((value) => (
+                <View key={value} style={styles.timeChip}>
+                  <IconSymbol name="alarm.fill" size={14} color={Palette.warning} />
+                  <Text style={styles.timeChipText}>{timeLabel(value)}</Text>
+                  <Pressable hitSlop={8} onPress={() => removeTime(value)} accessibilityRole="button">
+                    <IconSymbol name="trash" size={14} color={Palette.textMuted} />
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          )}
+
+          <View style={[styles.timeAddRow, layout.centerContent]}>
             <DateTimePicker
-              value={time}
+              value={draft}
               mode="time"
-              display="spinner"
-              onChange={(_, selected) => selected && setTime(selected)}
+              display={Platform.OS === 'ios' ? 'compact' : 'default'}
+              onChange={(_, selected) => selected && setDraft(selected)}
               minuteInterval={5}
             />
+            <Pressable style={styles.addTimeButton} onPress={addTime} accessibilityRole="button">
+              <IconSymbol name="plus" size={16} color={Palette.warning} />
+              <Text style={styles.addTimeText}>{t('reminders.addTime')}</Text>
+            </Pressable>
           </View>
 
           <View style={layout.centerContent}>

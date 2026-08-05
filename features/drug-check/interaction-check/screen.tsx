@@ -6,6 +6,7 @@ import { checkLocalInteraction, getPremiumStatus, type InteractionResult } from 
 import { styles } from './styles';
 
 import { PrimaryButton } from '@/components/form';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
@@ -54,14 +55,18 @@ export default function InteractionCheckScreen() {
         contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled">
         <View style={[styles.hero, layout.centerContent]}>
-          <Text style={styles.badge}>🧬</Text>
+          <View style={styles.heroIcon}>
+            <IconSymbol name="pills.fill" size={30} color={Palette.primary} />
+          </View>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('interaction.hero')}</Text>
           <Text style={styles.subtitle}>{t('interaction.subtitle')}</Text>
         </View>
 
         {!premium ? (
           <View style={[styles.lockCard, layout.centerContent]}>
-            <Text style={styles.lockIcon}>🔒</Text>
+            <View style={styles.lockIconWrap}>
+              <IconSymbol name="lock.fill" size={26} color={Palette.premium} />
+            </View>
             <Text style={styles.lockTitle}>{t('premium.lockedTitle')}</Text>
             <Text style={styles.lockText}>{t('premium.lockedInteraction')}</Text>
             <PrimaryButton title={t('premium.open')} onPress={() => router.push('/premium' as never)} />

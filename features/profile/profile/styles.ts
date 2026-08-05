@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
   avatarText: {
     color: Palette.primary,
     fontSize: 25,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   profileCopy: {
     flex: 1,
@@ -42,12 +42,12 @@ export const styles = StyleSheet.create({
   eyebrow: {
     color: Palette.primary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 1.1,
   },
   title: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
     marginTop: 2,
   },
@@ -91,19 +91,19 @@ export const styles = StyleSheet.create({
   statValue: {
     color: Palette.primary,
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   statValueDanger: {
     color: Palette.danger,
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   statLabel: {
     color: Palette.textSecondary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     marginTop: 3,
   },
   emailLabel: {
@@ -157,26 +157,36 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Palette.border,
   },
+  navGroup: {
+    marginTop: 16,
+    gap: 10,
+  },
   navRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
     backgroundColor: Palette.surface,
     borderRadius: Radius.large,
-    padding: 16,
-    marginTop: 12,
+    paddingVertical: 13,
+    paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: Palette.border,
     boxShadow: Shadows.soft,
   },
-  navTitle: {
-    color: Palette.text,
-    fontSize: 15,
-    fontWeight: '900',
+  navRowPressed: {
+    opacity: 0.7,
   },
-  navArrow: {
-    color: Palette.textMuted,
-    fontSize: 26,
+  navIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navTitle: {
+    flex: 1,
+    color: Palette.text,
+    fontSize: 16,
     fontWeight: '600',
   },
   adminRow: {
@@ -194,7 +204,7 @@ export const styles = StyleSheet.create({
   adminTitle: {
     color: Palette.text,
     fontSize: 15,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   adminArrow: {
     color: Palette.textMuted,
@@ -233,7 +243,7 @@ export const styles = StyleSheet.create({
   premiumLink: {
     color: Palette.premium,
     fontSize: 13,
-    fontWeight: '900',
+    fontWeight: '800',
     marginTop: 10,
   },
   signOut: {

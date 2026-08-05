@@ -13,8 +13,16 @@ export const styles = StyleSheet.create({
     borderColor: Palette.border,
     boxShadow: Shadows.soft,
   },
-  badge: { fontSize: 34, marginBottom: 8 },
-  title: { color: Palette.text, fontWeight: '900' },
+  heroIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    backgroundColor: Palette.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  title: { color: Palette.text, fontWeight: '800' },
   subtitle: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20, marginTop: 6 },
   card: {
     borderRadius: Radius.xlarge,
@@ -24,7 +32,7 @@ export const styles = StyleSheet.create({
     borderColor: Palette.border,
     boxShadow: Shadows.soft,
   },
-  label: { color: Palette.textSecondary, fontSize: 12, fontWeight: '900', marginTop: 12, marginBottom: 7 },
+  label: { color: Palette.textSecondary, fontSize: 12, fontWeight: '800', marginTop: 12, marginBottom: 7 },
   typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   typeChip: {
     borderRadius: Radius.pill,
@@ -35,7 +43,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.surface,
   },
   typeChipSelected: { backgroundColor: Palette.primary, borderColor: Palette.primary },
-  typeText: { color: Palette.textSecondary, fontSize: 12, fontWeight: '900' },
+  typeText: { color: Palette.textSecondary, fontSize: 12, fontWeight: '800' },
   typeTextSelected: { color: Palette.white },
   input: {
     borderRadius: Radius.large,

@@ -54,14 +54,14 @@ export const styles = StyleSheet.create({
   eyebrow: {
     marginTop: 20,
     color: Palette.primary,
-    fontWeight: '800',
+    fontWeight: '700',
     fontSize: 11,
     letterSpacing: 1.5,
     textAlign: 'center',
   },
   title: {
     fontSize: 31,
-    fontWeight: '900',
+    fontWeight: '800',
     textAlign: 'center',
     color: Palette.text,
     marginTop: 6,
@@ -99,7 +99,7 @@ export const styles = StyleSheet.create({
   trustIcon: {
     color: Palette.primary,
     fontSize: 16,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   trustText: {
     color: Palette.textSecondary,
@@ -142,7 +142,7 @@ export const styles = StyleSheet.create({
   checkmark: {
     color: Palette.white,
     fontSize: 14,
-    fontWeight: '900',
+    fontWeight: '800',
     lineHeight: 17,
   },
   rememberText: {
@@ -193,14 +193,14 @@ export const styles = StyleSheet.create({
     backgroundColor: Palette.surfaceMuted,
     color: Palette.text,
     fontSize: 15,
-    fontWeight: '900',
+    fontWeight: '800',
     lineHeight: 24,
     textAlign: 'center',
   },
   socialText: {
     color: Palette.text,
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   appleButton: {
     backgroundColor: Palette.text,
@@ -209,13 +209,13 @@ export const styles = StyleSheet.create({
   appleIcon: {
     color: Palette.background,
     fontSize: 20,
-    fontWeight: '800',
+    fontWeight: '700',
     marginTop: -2,
   },
   appleText: {
     color: Palette.background,
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   link: {
     color: PRIMARY,

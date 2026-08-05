@@ -64,32 +64,22 @@ export async function loadStoreProducts(userId: string) {
 
 export async function buyStoreProduct(product: AdaptyPaywallProduct, userId: string) {
   const profile = await purchasePremiumProduct(product, userId);
-  return syncAdaptyPremiumToSupabase(profile, userId);
+  return resolveAdaptyPremium(profile);
 }
 
 export async function restoreStorePurchases(userId: string) {
   const profile = await restorePremiumPurchases(userId);
-  return syncAdaptyPremiumToSupabase(profile, userId);
+  return resolveAdaptyPremium(profile);
 }
 
-async function syncAdaptyPremiumToSupabase(profile: AdaptyProfile | null, userId: string) {
-  const isPremium = hasPremiumAccess(profile);
-  const premiumUntil = premiumExpiresAt(profile);
-
-  if (isPremium) {
-    await supabase
-      .from('profiles')
-      .update({
-        is_premium: true,
-        premium_until: premiumUntil,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', userId);
-  }
-
+// Not: is_premium / premium_until artık istemciden YAZILMIYOR (güvenlik). Bunlar
+// yalnızca Adapty webhook Edge Function'ı tarafından service_role ile güncellenir
+// (bkz. supabase/functions/adapty-webhook). Burada sadece satın alma/geri yükleme
+// sonrası anlık UI için Adapty profilinden premium durumunu okuyoruz.
+function resolveAdaptyPremium(profile: AdaptyProfile | null) {
   return {
-    isPremium,
-    premiumUntil,
+    isPremium: hasPremiumAccess(profile),
+    premiumUntil: premiumExpiresAt(profile),
   };
 }
 

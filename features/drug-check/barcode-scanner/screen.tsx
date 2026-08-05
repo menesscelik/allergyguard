@@ -88,6 +88,16 @@ export default function ScanScreen() {
           onBarcodeScanned={locked ? undefined : handleBarcode}
         />
 
+        {/* Tarama çerçevesi — barkodu bu dikdörtgenin içine hizala */}
+        <View style={styles.scanOverlay} pointerEvents="none">
+          <View style={styles.scanFrame}>
+            <View style={[styles.scanCorner, styles.cornerTL]} />
+            <View style={[styles.scanCorner, styles.cornerTR]} />
+            <View style={[styles.scanCorner, styles.cornerBL]} />
+            <View style={[styles.scanCorner, styles.cornerBR]} />
+          </View>
+        </View>
+
         {/* Alt bilgi kartı */}
         <View style={styles.panel}>
           {busy && (

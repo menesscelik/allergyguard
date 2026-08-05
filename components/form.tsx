@@ -93,6 +93,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Palette.white,
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '800',
   },
 });

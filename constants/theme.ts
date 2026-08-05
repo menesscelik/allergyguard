@@ -72,6 +72,26 @@ export const Shadows = {
   danger: '0 8px 20px rgba(225, 29, 72, 0.10)',
 } as const;
 
+/** 4'ün katları — tutarlı boşluk ölçeği. */
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+} as const;
+
+/** iOS'a yakın tipografi ölçeği. `...Type.title` şeklinde yayılır. */
+export const Type = {
+  largeTitle: { fontSize: 32, fontWeight: '700', letterSpacing: -0.5 },
+  title: { fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
+  headline: { fontSize: 17, fontWeight: '600' },
+  body: { fontSize: 15, fontWeight: '400', lineHeight: 21 },
+  callout: { fontSize: 14, fontWeight: '500' },
+  caption: { fontSize: 12, fontWeight: '500' },
+} as const;
+
 export const Colors = {
   light: {
     text: Palette.text,

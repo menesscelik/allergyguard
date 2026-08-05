@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
   title: {
     color: Palette.text,
     fontSize: 27,
-    fontWeight: '900',
+    fontWeight: '800',
     textAlign: 'center',
     marginTop: 18,
   },
@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Palette.danger,
   },
-  errorTitle: { color: Palette.danger, fontSize: 16, fontWeight: '800' },
+  errorTitle: { color: Palette.danger, fontSize: 16, fontWeight: '700' },
   errorText: { color: Palette.textSecondary, fontSize: 13, lineHeight: 19, marginTop: 6 },
   errorAction: {
     alignItems: 'center',
@@ -60,6 +60,6 @@ export const styles = StyleSheet.create({
   errorActionText: {
     color: Palette.primary,
     fontSize: 14,
-    fontWeight: '900',
+    fontWeight: '800',
   },
 });

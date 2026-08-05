@@ -10,6 +10,55 @@ export const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
+  scanOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 160,
+  },
+  scanFrame: {
+    width: '76%',
+    height: 150,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  scanCorner: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    borderColor: PRIMARY,
+    borderRadius: 4,
+  },
+  cornerTL: {
+    top: -2,
+    left: -2,
+    borderTopWidth: 4,
+    borderLeftWidth: 4,
+    borderTopLeftRadius: 18,
+  },
+  cornerTR: {
+    top: -2,
+    right: -2,
+    borderTopWidth: 4,
+    borderRightWidth: 4,
+    borderTopRightRadius: 18,
+  },
+  cornerBL: {
+    bottom: -2,
+    left: -2,
+    borderBottomWidth: 4,
+    borderLeftWidth: 4,
+    borderBottomLeftRadius: 18,
+  },
+  cornerBR: {
+    bottom: -2,
+    right: -2,
+    borderBottomWidth: 4,
+    borderRightWidth: 4,
+    borderBottomRightRadius: 18,
+  },
   panel: {
     backgroundColor: Palette.surface,
     borderTopLeftRadius: Radius.xlarge,
@@ -51,7 +100,7 @@ export const styles = StyleSheet.create({
   },
   drugName: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
   },
   ingredients: {

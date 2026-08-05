@@ -1,10 +1,19 @@
 import { router, usePathname } from 'expo-router';
 import { type ReactNode, useCallback, useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
-const TAB_PATHS = ['/', '/test', '/history', '/reminders', '/profile'] as const;
+const TAB_PATHS = ['/', '/test', '/family', '/reminders', '/profile'] as const;
+const SCREEN_WIDTH = Dimensions.get('window').width;
+// Yeni sekme bu kadar içeriden kayarak gelir ("hafif" his için tam ekran değil).
+const SLIDE_IN_OFFSET = SCREEN_WIDTH * 0.35;
 
 function normalizePath(pathname: string) {
   return pathname.replace(/\/$/, '') || '/';
@@ -15,46 +24,75 @@ export function SwipeableTabsShell({ children }: { children: ReactNode }) {
   const normalizedPath = normalizePath(pathname);
   const currentIndex = TAB_PATHS.indexOf(normalizedPath as (typeof TAB_PATHS)[number]);
   const isTabRoute = currentIndex >= 0;
+  const isFirst = currentIndex <= 0;
+  const isLast = currentIndex >= TAB_PATHS.length - 1;
 
-  const navigateBySwipe = useCallback((direction: 'next' | 'previous') => {
-    if (!isTabRoute) {
-      return;
-    }
+  const translateX = useSharedValue(0);
 
-    const nextIndex = direction === 'next'
-      ? Math.min(currentIndex + 1, TAB_PATHS.length - 1)
-      : Math.max(currentIndex - 1, 0);
+  const navigateBySwipe = useCallback(
+    (direction: 'next' | 'previous') => {
+      if (!isTabRoute) {
+        return;
+      }
 
-    if (nextIndex !== currentIndex) {
-      router.navigate(TAB_PATHS[nextIndex] as never);
-    }
-  }, [currentIndex, isTabRoute]);
+      const nextIndex =
+        direction === 'next'
+          ? Math.min(currentIndex + 1, TAB_PATHS.length - 1)
+          : Math.max(currentIndex - 1, 0);
+
+      if (nextIndex !== currentIndex) {
+        router.navigate(TAB_PATHS[nextIndex] as never);
+      }
+    },
+    [currentIndex, isTabRoute],
+  );
 
   const panGesture = useMemo(
     () =>
       Gesture.Pan()
         .enabled(isTabRoute)
-        .activeOffsetX([-52, 52])
-        .failOffsetY([-36, 36])
+        .activeOffsetX([-24, 24])
+        .failOffsetY([-24, 24])
+        .onUpdate((event) => {
+          'worklet';
+          const goingNext = event.translationX < 0;
+          const blocked = (goingNext && isLast) || (!goingNext && isFirst);
+          // Kenardaysa daha fazla direnç (rubber-band), değilse parmağı yumuşak takip.
+          const factor = blocked ? 0.12 : 0.35;
+          translateX.value = event.translationX * factor;
+        })
         .onEnd((event) => {
-          const isIntentionalSwipe = Math.abs(event.translationX) > 72 || Math.abs(event.velocityX) > 720;
+          'worklet';
+          const isIntentionalSwipe =
+            Math.abs(event.translationX) > 72 || Math.abs(event.velocityX) > 720;
+          const goingNext = event.translationX < 0;
+          const blocked = (goingNext && isLast) || (!goingNext && isFirst);
 
-          if (!isIntentionalSwipe) {
-            return;
-          }
-
-          if (event.translationX < 0) {
-            runOnJS(navigateBySwipe)('next');
+          if (isIntentionalSwipe && !blocked) {
+            runOnJS(navigateBySwipe)(goingNext ? 'next' : 'previous');
+            // Yeni ekran, gidilen yönün tersinden içeri kayarak gelsin.
+            translateX.value = (goingNext ? 1 : -1) * SLIDE_IN_OFFSET;
+            translateX.value = withTiming(0, {
+              duration: 240,
+              easing: Easing.out(Easing.cubic),
+            });
           } else {
-            runOnJS(navigateBySwipe)('previous');
+            translateX.value = withTiming(0, {
+              duration: 200,
+              easing: Easing.out(Easing.cubic),
+            });
           }
         }),
-    [isTabRoute, navigateBySwipe],
+    [isTabRoute, isFirst, isLast, navigateBySwipe, translateX],
   );
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   return (
     <GestureDetector gesture={panGesture}>
-      <View style={styles.container}>{children}</View>
+      <Animated.View style={[styles.container, animatedStyle]}>{children}</Animated.View>
     </GestureDetector>
   );
 }

@@ -59,7 +59,8 @@ export type Reminder = {
   user_id: string;
   drug_name: string;
   allergy_id: string | null;
-  remind_time: string; // "08:30:00"
+  remind_time: string; // "08:30:00" — ilk saat (geri uyumluluk)
+  remind_times: string[]; // ["08:30:00", "21:00:00"] — günlük tüm saatler
   repeat_days: number[]; // 1=Pzt ... 7=Paz
   is_active: boolean;
   notes: string | null;

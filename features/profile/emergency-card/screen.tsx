@@ -6,6 +6,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { getEmergencyCardData } from './service';
 import { styles } from './styles';
 
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -45,7 +47,9 @@ export default function EmergencyCardScreen() {
         contentContainerStyle={[styles.content, { paddingHorizontal: layout.pagePadding }]}
         contentInsetAdjustmentBehavior="automatic">
         <Animated.View entering={FadeInDown.duration(240)} style={[styles.hero, layout.centerContent]}>
-          <Text style={styles.badge}>🆘</Text>
+          <View style={styles.heroIcon}>
+            <IconSymbol name="cross.case.fill" size={30} color={Palette.white} />
+          </View>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('emergency.hero')}</Text>
           <Text selectable style={styles.name}>{profile?.full_name || session?.user.email || t('profile.fallbackName')}</Text>
           <Text selectable style={styles.email}>{session?.user.email}</Text>

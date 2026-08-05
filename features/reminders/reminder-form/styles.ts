@@ -18,10 +18,10 @@ export const styles = StyleSheet.create({
   },
   introIcon: {
     width: 48, height: 48, borderRadius: 16, alignItems: 'center',
-    justifyContent: 'center', backgroundColor: Palette.surface,
+    justifyContent: 'center', backgroundColor: Palette.warningSoft,
   },
   introEmoji: { fontSize: 25 },
-  introTitle: { color: Palette.text, fontSize: 17, fontWeight: '800' },
+  introTitle: { color: Palette.text, fontSize: 17, fontWeight: '700' },
   introText: { color: Palette.textSecondary, fontSize: 12, marginTop: 3 },
   label: {
     fontSize: 14,
@@ -32,6 +32,47 @@ export const styles = StyleSheet.create({
   timePicker: {
     alignItems: 'center',
     marginBottom: 16,
+  },
+  timeChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  timeChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    paddingLeft: 12,
+    paddingRight: 10,
+    paddingVertical: 9,
+    borderRadius: Radius.pill,
+    backgroundColor: Palette.warningSoft,
+  },
+  timeChipText: {
+    color: Palette.text,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  timeAddRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  addTimeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: Radius.large,
+    backgroundColor: Palette.warningSoft,
+  },
+  addTimeText: {
+    color: Palette.warning,
+    fontSize: 14,
+    fontWeight: '700',
   },
   dayRow: {
     flexDirection: 'row',

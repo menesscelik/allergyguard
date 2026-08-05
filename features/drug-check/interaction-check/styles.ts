@@ -13,8 +13,16 @@ export const styles = StyleSheet.create({
     borderColor: Palette.border,
     boxShadow: Shadows.soft,
   },
-  badge: { fontSize: 34, marginBottom: 8 },
-  title: { color: Palette.text, fontWeight: '900' },
+  heroIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: Palette.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  title: { color: Palette.text, fontWeight: '800' },
   subtitle: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20, marginTop: 6 },
   lockCard: {
     borderRadius: Radius.xlarge,
@@ -25,8 +33,16 @@ export const styles = StyleSheet.create({
     boxShadow: Shadows.soft,
     gap: 10,
   },
-  lockIcon: { fontSize: 32 },
-  lockTitle: { color: Palette.text, fontSize: 20, fontWeight: '900' },
+  lockIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: Palette.premiumSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  lockTitle: { color: Palette.text, fontSize: 20, fontWeight: '800' },
   lockText: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20 },
   card: {
     borderRadius: Radius.xlarge,
@@ -37,7 +53,7 @@ export const styles = StyleSheet.create({
     boxShadow: Shadows.soft,
     gap: 10,
   },
-  groupTitle: { color: Palette.text, fontSize: 15, fontWeight: '900', marginTop: 6 },
+  groupTitle: { color: Palette.text, fontSize: 15, fontWeight: '800', marginTop: 6 },
   input: {
     borderRadius: Radius.large,
     borderWidth: 1,
@@ -55,7 +71,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resultEmoji: { fontSize: 36 },
-  resultTitle: { fontSize: 20, fontWeight: '900', marginTop: 8, textAlign: 'center' },
+  resultTitle: { fontSize: 20, fontWeight: '800', marginTop: 8, textAlign: 'center' },
   resultText: { color: Palette.textSecondary, fontSize: 14, lineHeight: 20, marginTop: 8, textAlign: 'center' },
   overlapBox: {
     alignSelf: 'stretch',
@@ -64,6 +80,6 @@ export const styles = StyleSheet.create({
     padding: 12,
     marginTop: 12,
   },
-  overlapText: { fontSize: 14, fontWeight: '900', lineHeight: 22 },
+  overlapText: { fontSize: 14, fontWeight: '800', lineHeight: 22 },
   disclaimer: { fontSize: 12, lineHeight: 18, textAlign: 'center' },
 });

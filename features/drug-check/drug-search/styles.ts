@@ -28,7 +28,7 @@ export const styles = StyleSheet.create({
   eyebrow: {
     color: Palette.primary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 1.2,
   },
   labBadge: {
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
     marginTop: 3,
   },
@@ -156,9 +156,14 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingTop: 60,
   },
-  emptyEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    backgroundColor: Palette.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
   },
   emptyText: {
     fontSize: 14,

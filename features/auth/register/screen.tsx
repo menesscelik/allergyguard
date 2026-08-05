@@ -13,6 +13,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PrimaryButton } from '@/components/form';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Palette } from '@/constants/theme';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
 
@@ -86,7 +88,7 @@ export default function RegisterScreen() {
             },
           ]}
           keyboardShouldPersistTaps="handled">
-          <View style={[styles.iconBadge, { width: layout.badgeSize, height: layout.badgeSize }]}><Text style={styles.icon}>🛡️</Text></View>
+          <View style={[styles.iconBadge, { width: layout.badgeSize, height: layout.badgeSize }]}><IconSymbol name="shield.checkered" size={32} color={Palette.primary} /></View>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('auth.register.title')}</Text>
           <Text style={styles.subtitle}>{t('auth.register.subtitle')}</Text>
 

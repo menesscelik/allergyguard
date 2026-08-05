@@ -14,6 +14,8 @@ import {
 } from 'react-native';
 
 import { FormInput, PrimaryButton } from '@/components/form';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
 import type { TrDrugSuggestion } from '@/lib/drugs';
 import { useLocalization } from '@/lib/localization-context';
@@ -115,7 +117,7 @@ export default function AddAllergyScreen() {
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled">
           <View style={[styles.introCard, layout.centerContent, { padding: layout.heroPadding }]}>
-            <View style={styles.introIcon}><Text style={styles.introEmoji}>🛡️</Text></View>
+            <View style={styles.introIcon}><IconSymbol name="shield.checkered" size={24} color={Palette.primary} /></View>
             <View style={{ flex: 1 }}>
               <Text style={styles.introTitle}>
                 {isEdit ? t('allergies.editTitle') : t('allergies.addTitle')}

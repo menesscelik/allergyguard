@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Palette.primary,
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '800',
   },
 });

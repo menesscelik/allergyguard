@@ -50,26 +50,29 @@ function parseTime(remindTime: string): { hour: number; minute: number } {
 }
 
 async function scheduleReminder(reminder: Reminder, language: 'tr' | 'en') {
-  const { hour, minute } = parseTime(reminder.remind_time);
+  const times = reminder.remind_times?.length ? reminder.remind_times : [reminder.remind_time];
   for (const day of reminder.repeat_days) {
-    await Notifications.scheduleNotificationAsync({
-      identifier: `reminder-${reminder.id}-${day}`,
-      content: {
-        title: language === 'en' ? 'Medicine Time 💊' : 'İlaç Vakti 💊',
-        body: language === 'en'
-          ? `Time for ${reminder.drug_name}!${reminder.notes ? ` (${reminder.notes})` : ''}`
-          : `${reminder.drug_name} zamanı!${reminder.notes ? ` (${reminder.notes})` : ''}`,
-        sound: 'default',
-        data: { reminder_id: reminder.id },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday: toExpoWeekday(day),
-        hour,
-        minute,
-        channelId: Platform.OS === 'android' ? 'reminders' : undefined,
-      },
-    });
+    for (let ti = 0; ti < times.length; ti++) {
+      const { hour, minute } = parseTime(times[ti]);
+      await Notifications.scheduleNotificationAsync({
+        identifier: `reminder-${reminder.id}-${day}-${ti}`,
+        content: {
+          title: language === 'en' ? 'Medicine Time 💊' : 'İlaç Vakti 💊',
+          body: language === 'en'
+            ? `Time for ${reminder.drug_name}!${reminder.notes ? ` (${reminder.notes})` : ''}`
+            : `${reminder.drug_name} zamanı!${reminder.notes ? ` (${reminder.notes})` : ''}`,
+          sound: 'default',
+          data: { reminder_id: reminder.id },
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+          weekday: toExpoWeekday(day),
+          hour,
+          minute,
+          channelId: Platform.OS === 'android' ? 'reminders' : undefined,
+        },
+      });
+    }
   }
 }
 

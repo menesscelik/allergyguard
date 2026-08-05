@@ -24,12 +24,12 @@ export const styles = StyleSheet.create({
   eyebrow: {
     color: Palette.primary,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 1.2,
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
     marginTop: 3,
   },
@@ -42,15 +42,45 @@ export const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 19,
-    backgroundColor: Palette.surface,
+    backgroundColor: Palette.warningSoft,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  statsCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Palette.surface,
+    borderRadius: Radius.xlarge,
     borderWidth: 1,
     borderColor: Palette.border,
     boxShadow: Shadows.soft,
+    paddingVertical: 16,
+    marginBottom: 12,
   },
-  clockEmoji: {
-    fontSize: 29,
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+  },
+  statValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  statValue: {
+    color: Palette.text,
+    fontSize: 22,
+    fontWeight: '700',
+  },
+  statLabel: {
+    color: Palette.textSecondary,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  statDivider: {
+    width: 1,
+    height: 34,
+    backgroundColor: Palette.border,
   },
   calendarCard: {
     marginBottom: 14,
@@ -70,7 +100,7 @@ export const styles = StyleSheet.create({
   calendarTitle: {
     color: Palette.text,
     fontSize: 15,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   calendarSubtitle: {
     color: Palette.textSecondary,
@@ -92,12 +122,12 @@ export const styles = StyleSheet.create({
   dayLabel: {
     color: Palette.textMuted,
     fontSize: 10,
-    fontWeight: '800',
+    fontWeight: '700',
   },
   dayCount: {
     color: Palette.primary,
     fontSize: 16,
-    fontWeight: '900',
+    fontWeight: '800',
     fontVariant: ['tabular-nums'],
   },
   list: {
@@ -118,7 +148,7 @@ export const styles = StyleSheet.create({
   },
   time: {
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: '700',
     color: Palette.text,
   },
   drugName: {
@@ -162,7 +192,7 @@ export const styles = StyleSheet.create({
   },
   intakeText: {
     fontSize: 12,
-    fontWeight: '900',
+    fontWeight: '800',
   },
   intakeTakenText: {
     color: Palette.success,
@@ -184,8 +214,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 32,
   },
-  emptyEmoji: {
-    fontSize: 44,
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 22,
+    backgroundColor: Palette.warningSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   emptyTitle: {
     fontSize: 18,

@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
   icon: { fontSize: 28 },
   title: {
     fontSize: 31,
-    fontWeight: '900',
+    fontWeight: '800',
     textAlign: 'center',
     color: Palette.text,
   },

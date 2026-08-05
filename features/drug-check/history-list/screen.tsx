@@ -7,6 +7,7 @@ import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated'
 import { listDrugChecks } from './service';
 import { styles } from './styles';
 
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Palette } from '@/constants/theme';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -90,7 +91,7 @@ export default function HistoryScreen() {
           <Text style={styles.subtitle}>{t('history.subtitle')}</Text>
         </View>
         <View style={[styles.headerBadge, { width: layout.badgeSize, height: layout.badgeSize }]}>
-          <Text style={styles.headerEmoji}>📋</Text>
+          <IconSymbol name="clock.arrow.circlepath" size={28} color={Palette.primary} />
         </View>
       </View>
 
@@ -179,7 +180,9 @@ export default function HistoryScreen() {
         ListEmptyComponent={
           loaded ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyEmoji}>🧪</Text>
+              <View style={styles.emptyIcon}>
+                <IconSymbol name="clock.arrow.circlepath" size={32} color={Palette.primary} />
+              </View>
               <Text style={styles.emptyTitle}>
                 {items.length > 0 ? t('history.emptyFilterTitle') : t('history.emptyTitle')}
               </Text>
