@@ -123,6 +123,35 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  chipsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 11,
+    borderRadius: Radius.pill,
+    borderWidth: 1.5,
+    borderColor: Palette.border,
+    backgroundColor: Palette.surface,
+  },
+  chipOn: {
+    borderColor: Palette.primary,
+    backgroundColor: Palette.primary,
+  },
+  chipText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Palette.text,
+  },
+  chipTextOn: {
+    color: Palette.white,
+  },
 
   // Alerji kartı
   mockCard: {

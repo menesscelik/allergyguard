@@ -15,10 +15,17 @@ import { useCompleteOnboarding } from './service';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Palette } from '@/constants/theme';
 import { useLocalization } from '@/lib/localization-context';
+import { savePendingAllergies } from '@/lib/onboarding-prefill';
 
 type SFName = ComponentProps<typeof IconSymbol>['name'];
-type Variant = 'hero' | 'allergy' | 'result' | 'reminder';
+type Variant = 'hero' | 'allergy' | 'result' | 'reminder' | 'personalize';
 type Slide = { key: string; variant: Variant; tint: string; soft: string; icon: SFName; title: string; text: string };
+
+// Sık görülen ilaç alerjileri — onboarding'de hızlı seçim için.
+const COMMON_ALLERGENS = [
+  'Penisilin', 'Amoksisilin', 'Aspirin', 'İbuprofen', 'Parasetamol',
+  'Sülfonamid', 'Sefalosporin', 'Naproksen', 'Kodein', 'Metamizol',
+];
 
 export default function OnboardingScreen() {
   const { t } = useLocalization();
@@ -27,6 +34,11 @@ export default function OnboardingScreen() {
 
   const listRef = useRef<FlatList<Slide>>(null);
   const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState<string[]>([]);
+
+  function toggleAllergen(name: string) {
+    setSelected((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
+  }
 
   const slides = useMemo<Slide[]>(
     () => [
@@ -34,6 +46,7 @@ export default function OnboardingScreen() {
       { key: 'allergies', variant: 'allergy', tint: Palette.coral, soft: Palette.coralSoft, icon: 'cross.case.fill', title: t('onboarding.cards.allergies.title'), text: t('onboarding.cards.allergies.text') },
       { key: 'check', variant: 'result', tint: Palette.success, soft: Palette.successSoft, icon: 'checkmark.circle.fill', title: t('onboarding.cards.check.title'), text: t('onboarding.cards.check.text') },
       { key: 'reminders', variant: 'reminder', tint: Palette.warning, soft: Palette.warningSoft, icon: 'alarm.fill', title: t('onboarding.cards.reminders.title'), text: t('onboarding.cards.reminders.text') },
+      { key: 'personalize', variant: 'personalize', tint: Palette.primary, soft: Palette.primarySoft, icon: 'cross.case.fill', title: t('onboarding.personalizeTitle'), text: t('onboarding.personalizeText') },
     ],
     [t]
   );
@@ -48,8 +61,9 @@ export default function OnboardingScreen() {
   });
   const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 60 });
 
-  function goNext() {
+  async function goNext() {
     if (isLast) {
+      await savePendingAllergies(selected);
       complete();
       return;
     }
@@ -77,6 +91,7 @@ export default function OnboardingScreen() {
         showsHorizontalScrollIndicator={false}
         onViewableItemsChanged={onViewRef.current}
         viewabilityConfig={viewConfigRef.current}
+        extraData={selected}
         getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
@@ -101,6 +116,22 @@ export default function OnboardingScreen() {
                   {item.variant === 'allergy' && <AllergyMock />}
                   {item.variant === 'result' && <ResultMock />}
                   {item.variant === 'reminder' && <ReminderMock />}
+                  {item.variant === 'personalize' && (
+                    <View style={styles.chipsWrap}>
+                      {COMMON_ALLERGENS.map((name) => {
+                        const on = selected.includes(name);
+                        return (
+                          <Pressable
+                            key={name}
+                            onPress={() => toggleAllergen(name)}
+                            style={[styles.chip, on && styles.chipOn]}>
+                            {on && <IconSymbol name="checkmark" size={13} color={Palette.white} />}
+                            <Text style={[styles.chipText, on && styles.chipTextOn]}>{name}</Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  )}
                 </View>
               </>
             )}

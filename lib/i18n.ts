@@ -24,6 +24,8 @@ export const i18n = new I18n({
       start: 'Başlayalım',
       skip: 'Atla',
       next: 'İleri',
+      personalizeTitle: 'Bilinen alerjilerin var mı?',
+      personalizeText: 'Sık görülenlerden seç — listene ekleyelim. İstediğini sonra düzenleyebilir veya silebilirsin.',
     },
     auth: {
       login: {
@@ -314,6 +316,8 @@ export const i18n = new I18n({
       start: 'Get started',
       skip: 'Skip',
       next: 'Next',
+      personalizeTitle: 'Any known allergies?',
+      personalizeText: 'Pick from common ones — we’ll add them to your list. You can edit or remove them later.',
     },
     auth: {
       login: {

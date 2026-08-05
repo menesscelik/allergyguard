@@ -2,7 +2,7 @@ import { styles } from './styles';
 import { deleteAllergy, getTodaySummary, listAllergies } from './service';
 import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -19,6 +19,7 @@ import { SkeletonCard } from '@/components/skeleton';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
+import { applyPendingAllergies } from '@/lib/onboarding-prefill';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
 import { SEVERITY_COLORS, type Allergy } from '@/lib/types';
@@ -49,6 +50,16 @@ export default function AllergiesScreen() {
       load();
     }, [load])
   );
+
+  // Onboarding'de seçilen alerjileri ilk girişten sonra listeye ekle (bir kez).
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    applyPendingAllergies(session.user.id)
+      .then((added) => {
+        if (added > 0) load();
+      })
+      .catch(() => {});
+  }, [session, load]);
 
   async function handleRefresh() {
     setRefreshing(true);
