@@ -11,7 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.menescelik.allergyguard",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.menescelik.allergyguard"]
+      }
     },
     "android": {
       "package": "com.menescelik.allergyguard",
@@ -29,6 +32,7 @@
     },
     "plugins": [
       "expo-router",
+      "@bacons/apple-targets",
       [
         "expo-camera",
         {

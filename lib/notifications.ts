@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 
 import { supabase } from './supabase';
 import type { Reminder } from './types';
+import { updateWidget } from './widget';
 
 const ENABLED_KEY = 'notifications_enabled'; // 'on' (varsayılan) | 'off'
 
@@ -99,6 +100,9 @@ export async function syncAllNotifications() {
   for (const r of (reminders ?? []) as Reminder[]) {
     await scheduleReminder(r, language);
   }
+
+  // Widget'ı güncelle (sıradaki dozlar)
+  updateWidget((reminders ?? []) as Reminder[]);
 
   // Haftalık test hakkı bildirimi — her Pazartesi 09:00
   await Notifications.scheduleNotificationAsync({
