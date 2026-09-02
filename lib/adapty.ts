@@ -3,6 +3,10 @@ import { adapty, FetchPolicy, type AdaptyPaywallProduct, type AdaptyProfile } fr
 
 export const ADAPTY_PREMIUM_ACCESS_LEVEL = 'premium';
 export const ADAPTY_PREMIUM_PLACEMENT_ID = 'profile_premium';
+const APP_STORE_PREMIUM_PRODUCT_IDS = new Set([
+  'allergyguard_premium_monthly',
+  'allergyguard_premium_weekly',
+]);
 
 let activationPromise: Promise<void> | null = null;
 let identifiedUserId: string | null = null;
@@ -58,7 +62,8 @@ export async function getPremiumProducts(customerUserId?: string | null) {
     fetchPolicy: FetchPolicy.ReloadRevalidatingCacheData,
     loadTimeoutMs: 5000,
   });
-  return adapty.getPaywallProducts(flow);
+  const products = await adapty.getPaywallProducts(flow);
+  return products.filter((product) => APP_STORE_PREMIUM_PRODUCT_IDS.has(product.vendorProductId));
 }
 
 export async function purchasePremiumProduct(product: AdaptyPaywallProduct, customerUserId?: string | null) {

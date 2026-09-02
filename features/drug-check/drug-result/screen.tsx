@@ -3,7 +3,7 @@ import { analyzeDrug, asAnalysisResult, saveAnalyzedAllergy } from './service';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { PrimaryButton } from '@/components/form';
 import { useAuth } from '@/lib/auth-context';
@@ -195,9 +195,13 @@ export default function DrugResultScreen() {
               {!!result.evidence_sources?.length && (
                 <View style={styles.evidenceRow}>
                   {result.evidence_sources.map((source) => (
-                    <View key={source} style={styles.evidenceChip}>
-                      <Text style={styles.evidenceText}>✓ {source}</Text>
-                    </View>
+                    <Pressable
+                      accessibilityRole="link"
+                      key={source}
+                      onPress={() => Linking.openURL(sourceUrl(source))}
+                      style={styles.evidenceChip}>
+                      <Text style={styles.evidenceText}>{source} ↗</Text>
+                    </Pressable>
                   ))}
                 </View>
               )}
@@ -227,4 +231,9 @@ export default function DrugResultScreen() {
       </ScrollView>
     </>
   );
+}
+
+function sourceUrl(source: string) {
+  if (source === 'RxNorm') return 'https://www.nlm.nih.gov/research/umls/rxnorm/';
+  return 'https://www.titck.gov.tr/';
 }

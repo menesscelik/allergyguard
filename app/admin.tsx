@@ -1,1 +1,5 @@
-export { default } from '@/features/profile/admin/screen';
+import { Redirect } from 'expo-router';
+
+export default function AdminRedirect() {
+  return <Redirect href="/(tabs)" />;
+}

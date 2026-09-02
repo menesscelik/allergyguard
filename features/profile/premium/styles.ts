@@ -171,42 +171,6 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Promo (secondary)
-  promoCard: {
-    padding: 18,
-    borderRadius: Radius.xlarge,
-    backgroundColor: Palette.surface,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    boxShadow: Shadows.soft,
-    gap: 12,
-  },
-  promoHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  promoHeaderText: { flex: 1, gap: 3 },
-  promoTitle: { color: Palette.text, fontSize: 16, fontWeight: '700' },
-  promoText: { color: Palette.textSecondary, fontSize: 12, lineHeight: 18 },
-  promoInput: {
-    borderRadius: Radius.large,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    backgroundColor: Palette.surfaceMuted,
-    color: Palette.text,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textAlign: 'center',
-  },
-  promoButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    borderRadius: Radius.large,
-    backgroundColor: Palette.premiumSoft,
-  },
-  promoButtonText: { color: Palette.premium, fontSize: 15, fontWeight: '700' },
-
   note: {
     color: Palette.textMuted,
     fontSize: 12,
@@ -214,4 +178,7 @@ export const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 4,
   },
+  legalLinks: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 10 },
+  legalLink: { color: Palette.primary, fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' },
+  legalSeparator: { color: Palette.textMuted, fontSize: 12 },
 });

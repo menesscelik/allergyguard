@@ -70,8 +70,8 @@ export default function TabLayout() {
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="profile">
-          <Icon sf={{ default: 'person', selected: 'person.fill' }} drawable="ic_menu_myplaces" />
-          <Label>{t('tabs.profile')}</Label>
+          <Icon sf={{ default: 'gearshape', selected: 'gearshape.fill' }} drawable="ic_menu_manage" />
+          <Label>{t('tabs.settings')}</Label>
         </NativeTabs.Trigger>
       </NativeTabs>
     </SwipeableTabsShell>

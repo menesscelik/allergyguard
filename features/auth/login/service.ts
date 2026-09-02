@@ -72,7 +72,18 @@ export async function signInWithApple() {
     nonce: rawNonce,
   });
 
-  if (!result.error) await persistSuccessfulSocialSession();
+  if (!result.error) {
+    const fullName = credential.fullName
+      ? AppleAuthentication.formatFullName(credential.fullName, 'default').trim()
+      : '';
+    if (fullName && result.data.user) {
+      await Promise.all([
+        supabase.auth.updateUser({ data: { full_name: fullName } }),
+        supabase.from('profiles').update({ full_name: fullName }).eq('id', result.data.user.id),
+      ]);
+    }
+    await persistSuccessfulSocialSession();
+  }
   return result;
 }
 

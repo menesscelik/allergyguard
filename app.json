@@ -2,16 +2,21 @@
   "expo": {
     "name": "AllergyGuard",
     "slug": "allergyguard",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "com.menescelik.allergyguard",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "buildNumber": "3",
       "supportsTablet": true,
       "bundleIdentifier": "com.menescelik.allergyguard",
+      "appleTeamId": "C3TDN65XLG",
       "usesAppleSignIn": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "entitlements": {
         "com.apple.security.application-groups": ["group.com.menescelik.allergyguard"]
       }

@@ -1,20 +1,18 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Stack, router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
 import {
   buyStoreProduct,
   getPremiumStatus,
   loadStoreProducts,
   premiumFeatures,
-  redeemPromoCode,
   restoreStorePurchases,
   type AdaptyPaywallProduct,
 } from './service';
 import { styles } from './styles';
 
-import { KEYBOARD_DISMISS_ACCESSORY_ID } from '@/components/keyboard-dismiss-accessory';
 import { Palette } from '@/constants/theme';
 import { captureException } from '@/lib/monitoring';
 import { useAuth } from '@/lib/auth-context';
@@ -25,9 +23,6 @@ export default function PremiumScreen() {
   const { session } = useAuth();
   const { t, language } = useLocalization();
   const layout = useResponsiveLayout();
-  const [promoCode, setPromoCode] = useState('');
-  const [showPromo, setShowPromo] = useState(false);
-  const [redeeming, setRedeeming] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [purchasingProductId, setPurchasingProductId] = useState<string | null>(null);
   const [restoring, setRestoring] = useState(false);
@@ -75,8 +70,8 @@ export default function PremiumScreen() {
         if (!mounted) return;
         const sorted = sortProducts(nextProducts);
         setProducts(sorted);
-        // Apple paywall default: preselect the best-value (yearly) plan.
-        const featured = sorted.find(isYearlyProduct) ?? sorted[0];
+        // Apple paywall default: preselect the best-value (monthly) plan.
+        const featured = sorted.find(isMonthlyProduct) ?? sorted[0];
         setSelectedProductId(featured?.vendorProductId ?? null);
       })
       .catch((error: Error) => {
@@ -96,7 +91,7 @@ export default function PremiumScreen() {
     };
   }, [session]);
 
-  const monthlyProduct = useMemo(() => products.find((p) => !isYearlyProduct(p)), [products]);
+  const weeklyProduct = useMemo(() => products.find((p) => !isMonthlyProduct(p)), [products]);
   const selectedProduct = useMemo(
     () => products.find((p) => p.vendorProductId === selectedProductId) ?? null,
     [products, selectedProductId],
@@ -134,50 +129,18 @@ export default function PremiumScreen() {
     return `${symbol}${amount.toFixed(2)}`;
   }
 
-  function monthlyEquivalent(product: AdaptyPaywallProduct) {
+  function weeklyEquivalent(product: AdaptyPaywallProduct) {
     const amount = product.price?.amount;
-    if (!isYearlyProduct(product) || !amount) return null;
-    return `${formatMoney(amount / 12, product)}/${t('premium.purchase.perMonthShort')}`;
+    if (!isMonthlyProduct(product) || !amount) return null;
+    return `${formatMoney(amount / WEEKS_PER_MONTH, product)}/${t('premium.purchase.perWeekShort')}`;
   }
 
   function savingsPercent(product: AdaptyPaywallProduct) {
-    const yearly = product.price?.amount;
-    const monthly = monthlyProduct?.price?.amount;
-    if (!isYearlyProduct(product) || !yearly || !monthly) return null;
-    const percent = Math.round((1 - yearly / 12 / monthly) * 100);
+    const monthly = product.price?.amount;
+    const weekly = weeklyProduct?.price?.amount;
+    if (!isMonthlyProduct(product) || !monthly || !weekly) return null;
+    const percent = Math.round((1 - monthly / WEEKS_PER_MONTH / weekly) * 100);
     return percent > 0 ? percent : null;
-  }
-
-  async function handleRedeem() {
-    if (!promoCode.trim()) {
-      Alert.alert(t('common.error'), t('premium.promo.empty'));
-      return;
-    }
-
-    setRedeeming(true);
-    const { data, error } = await redeemPromoCode(promoCode).catch((error: Error) => ({
-      data: null,
-      error,
-    }));
-    setRedeeming(false);
-
-    if (error) {
-      Alert.alert(t('common.error'), error.message);
-      return;
-    }
-
-    if (!data?.success) {
-      Alert.alert(t('premium.promo.failedTitle'), t(`premium.promo.${data?.message_key ?? 'invalid'}`));
-      return;
-    }
-
-    setIsPremium(true);
-    setPremiumUntil(data.premium_until ?? null);
-    setPromoCode('');
-    Alert.alert(
-      t('premium.promo.successTitle'),
-      t('premium.promo.successText', { date: formatPremiumUntil(data.premium_until ?? null) })
-    );
   }
 
   async function handlePurchase(product: AdaptyPaywallProduct | null) {
@@ -276,9 +239,9 @@ export default function PremiumScreen() {
               <View style={styles.planList}>
                 {products.map((product) => {
                   const selected = product.vendorProductId === selectedProductId;
-                  const featured = isYearlyProduct(product);
+                  const featured = isMonthlyProduct(product);
                   const percent = savingsPercent(product);
-                  const perMonth = monthlyEquivalent(product);
+                  const perWeek = weeklyEquivalent(product);
                   return (
                     <Pressable
                       key={product.vendorProductId}
@@ -303,15 +266,15 @@ export default function PremiumScreen() {
                       </View>
                       <View style={styles.planInfo}>
                         <Text style={styles.planName}>
-                          {featured ? t('premium.purchase.yearly') : t('premium.purchase.monthly')}
+                          {featured ? t('premium.purchase.monthly') : t('premium.purchase.weekly')}
                         </Text>
                         <Text style={styles.planMeta}>
-                          {featured ? t('premium.purchase.billedYearly') : t('premium.purchase.billedMonthly')}
+                          {featured ? t('premium.purchase.billedMonthly') : t('premium.purchase.billedWeekly')}
                         </Text>
                       </View>
                       <View style={styles.planPriceCol}>
                         <Text style={styles.planPrice}>{product.price?.localizedString ?? '—'}</Text>
-                        {perMonth ? <Text style={styles.planPricePer}>{perMonth}</Text> : null}
+                        {perWeek ? <Text style={styles.planPricePer}>{perWeek}</Text> : null}
                       </View>
                     </Pressable>
                   );
@@ -351,66 +314,33 @@ export default function PremiumScreen() {
           </View>
         )}
 
-        {/* Promo code (secondary) */}
-        <View style={[styles.promoCard, layout.centerContent]}>
-          <Pressable
-            onPress={() => setShowPromo((v) => !v)}
-            style={styles.promoHeader}>
-            <View style={styles.promoHeaderText}>
-              <Text style={styles.promoTitle}>{t('premium.promo.title')}</Text>
-              <Text style={styles.promoText}>{t('premium.promo.subtitle')}</Text>
-            </View>
-            <MaterialIcons
-              name={showPromo ? 'expand-less' : 'expand-more'}
-              size={24}
-              color={Palette.textMuted}
-            />
-          </Pressable>
-
-          {showPromo && (
-            <>
-              <TextInput
-                inputAccessoryViewID={KEYBOARD_DISMISS_ACCESSORY_ID}
-                value={promoCode}
-                onChangeText={(value) => setPromoCode(value.toUpperCase())}
-                autoCapitalize="characters"
-                autoCorrect={false}
-                placeholder={t('premium.promo.placeholder')}
-                placeholderTextColor={Palette.textMuted}
-                style={styles.promoInput}
-              />
-              <Pressable
-                disabled={redeeming}
-                onPress={handleRedeem}
-                style={({ pressed }) => [
-                  styles.promoButton,
-                  redeeming && styles.ctaDisabled,
-                  pressed && styles.ctaPressed,
-                ]}>
-                <Text style={styles.promoButtonText}>
-                  {redeeming ? t('premium.promo.activating') : t('premium.promo.activate')}
-                </Text>
-              </Pressable>
-            </>
-          )}
-        </View>
-
         <View style={layout.centerContent}>
           <Text style={styles.note}>{t('premium.purchase.terms')}</Text>
+          <View style={styles.legalLinks}>
+            <Pressable accessibilityRole="link" onPress={() => router.push('/privacy-policy' as never)}>
+              <Text style={styles.legalLink}>{t('legal.privacy')}</Text>
+            </Pressable>
+            <Text style={styles.legalSeparator}>•</Text>
+            <Pressable accessibilityRole="link" onPress={() => router.push('/terms-of-use' as never)}>
+              <Text style={styles.legalLink}>{t('legal.terms')}</Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </>
   );
 }
 
-function isYearlyProduct(product: AdaptyPaywallProduct) {
-  return product.vendorProductId.includes('year') || product.subscription?.subscriptionPeriod.unit === 'year';
+const WEEKS_PER_MONTH = 52 / 12;
+
+function isMonthlyProduct(product: AdaptyPaywallProduct) {
+  return product.vendorProductId.includes('month') || product.subscription?.subscriptionPeriod.unit === 'month';
 }
 
 function sortProducts(products: AdaptyPaywallProduct[]) {
   return [...products].sort((a, b) => {
-    if (isYearlyProduct(a) && !isYearlyProduct(b)) return -1;
-    if (!isYearlyProduct(a) && isYearlyProduct(b)) return 1;
+    if (isMonthlyProduct(a) && !isMonthlyProduct(b)) return -1;
+    if (!isMonthlyProduct(a) && isMonthlyProduct(b)) return 1;
     return (a.price?.amount ?? 0) - (b.price?.amount ?? 0);
   });
 }

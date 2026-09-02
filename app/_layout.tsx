@@ -131,11 +131,14 @@ function RootNavigator() {
       <Stack.Screen name="drug-result" options={{ headerShown: true, title: t('analysis.title') }} />
       <Stack.Screen name="analysis-detail" options={{ headerShown: true, title: t('analysis.detailTitle') }} />
       <Stack.Screen name="premium" options={{ headerShown: true, title: t('premium.title') }} />
+      <Stack.Screen name="privacy-policy" options={{ headerShown: true, title: t('legal.privacy') }} />
+      <Stack.Screen name="terms-of-use" options={{ headerShown: true, title: t('legal.terms') }} />
       <Stack.Screen name="settings" options={{ headerShown: true, title: t('settings.title') }} />
       <Stack.Screen name="emergency-card" options={{ headerShown: true, title: t('emergency.title') }} />
       <Stack.Screen name="interaction-check" options={{ headerShown: true, title: t('interaction.title') }} />
       <Stack.Screen name="feedback" options={{ headerShown: true, title: t('feedback.title') }} />
       <Stack.Screen name="history" options={{ headerShown: true, title: t('tabs.history') }} />
+      <Stack.Screen name="edit-profile" options={{ headerShown: true, title: t('profile.editTitle') }} />
       <Stack.Screen name="family-member" options={{ headerShown: true, title: t('family.memberTitle') }} />
       <Stack.Screen name="admin" options={{ headerShown: true, title: t('admin.title') }} />
       <Stack.Screen name="scan" options={{ headerShown: true, title: t('scan.title') }} />

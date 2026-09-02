@@ -202,21 +202,8 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-  appleButton: {
-    backgroundColor: Palette.text,
-    borderColor: Palette.text,
-  },
-  appleIcon: {
-    color: Palette.background,
-    fontSize: 20,
-    fontWeight: '700',
-    marginTop: -2,
-  },
-  appleText: {
-    color: Palette.background,
-    fontSize: 14,
-    fontWeight: '700',
-  },
+  appleNativeButton: { width: '100%', height: 48, marginTop: 8 },
+  socialButtonDisabled: { opacity: 0.5 },
   link: {
     color: PRIMARY,
     fontWeight: '600',

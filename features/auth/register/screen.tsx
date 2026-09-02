@@ -6,6 +6,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   Text,
   View,
@@ -13,7 +14,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormInput, PrimaryButton } from '@/components/form';
+import { PrivacyConsentModal } from '@/components/privacy-consent-modal';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import { authErrorKey } from '@/lib/auth-errors';
 import { Palette } from '@/constants/theme';
 import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -23,16 +26,16 @@ export default function RegisterScreen() {
   const layout = useResponsiveLayout();
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
-  const [birthDateInput, setBirthDateInput] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   async function handleRegister() {
     const normalizedUsername = username.trim().toLowerCase();
-    const birthDate = parseBirthDate(birthDateInput);
 
-    if (!fullName.trim() || !normalizedUsername || !birthDateInput.trim() || !email.trim() || !password) {
+    if (!fullName.trim() || !normalizedUsername || !email.trim() || !password) {
       Alert.alert(t('common.error'), t('auth.register.missing'));
       return;
     }
@@ -40,25 +43,25 @@ export default function RegisterScreen() {
       Alert.alert(t('common.error'), t('auth.register.usernameInvalid'));
       return;
     }
-    if (!birthDate) {
-      Alert.alert(t('common.error'), t('auth.register.birthDateInvalid'));
-      return;
-    }
     if (password.length < 6) {
       Alert.alert(t('common.error'), t('auth.register.weak'));
+      return;
+    }
+    if (!privacyAccepted) {
+      // Gizlilik politikası onaylanmadan kayıt olunamaz — metni aç.
+      setShowPrivacy(true);
       return;
     }
     setLoading(true);
     const { data, error } = await registerAccount({
       fullName,
       username: normalizedUsername,
-      birthDate,
       email,
       password,
     });
     setLoading(false);
     if (error) {
-      Alert.alert(t('common.error'), error.message);
+      Alert.alert(t('common.error'), t(authErrorKey(error)));
       return;
     }
     if (!data.session) {
@@ -88,7 +91,7 @@ export default function RegisterScreen() {
             },
           ]}
           keyboardShouldPersistTaps="handled">
-          <View style={[styles.iconBadge, { width: layout.badgeSize, height: layout.badgeSize }]}><IconSymbol name="shield.checkered" size={32} color={Palette.primary} /></View>
+          <View style={styles.iconBadge}><IconSymbol name="shield.checkered" size={34} color={Palette.white} /></View>
           <Text style={[styles.title, { fontSize: layout.titleSize }]}>{t('auth.register.title')}</Text>
           <Text style={styles.subtitle}>{t('auth.register.subtitle')}</Text>
 
@@ -110,14 +113,6 @@ export default function RegisterScreen() {
               placeholder={t('auth.register.usernamePlaceholder')}
             />
             <FormInput
-              label={t('auth.register.birthDate')}
-              value={birthDateInput}
-              onChangeText={(value) => setBirthDateInput(formatBirthDateInput(value))}
-              keyboardType="number-pad"
-              maxLength={10}
-              placeholder={t('auth.register.birthDatePlaceholder')}
-            />
-            <FormInput
               label={t('common.email')}
               value={email}
               onChangeText={setEmail}
@@ -134,6 +129,16 @@ export default function RegisterScreen() {
               placeholder={t('auth.register.passwordHint')}
             />
 
+            <Pressable style={styles.consentRow} onPress={() => setShowPrivacy(true)}>
+              <View style={[styles.consentBox, privacyAccepted && styles.consentBoxOn]}>
+                {privacyAccepted && <IconSymbol name="checkmark" size={13} color={Palette.white} />}
+              </View>
+              <Text style={styles.consentText}>
+                {t('auth.register.privacyRow')}{' '}
+                <Text style={styles.consentLink}>{t('auth.register.privacyRead')}</Text>
+              </Text>
+            </Pressable>
+
             <PrimaryButton title={t('auth.register.submit')} onPress={handleRegister} loading={loading} />
           </View>
 
@@ -145,30 +150,12 @@ export default function RegisterScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <PrivacyConsentModal
+        visible={showPrivacy}
+        onClose={() => setShowPrivacy(false)}
+        onAccept={() => setPrivacyAccepted(true)}
+      />
     </SafeAreaView>
   );
-}
-
-function formatBirthDateInput(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
-}
-
-function parseBirthDate(value: string) {
-  const [dayText, monthText, yearText] = value.split('.');
-  const day = Number(dayText);
-  const month = Number(monthText);
-  const year = Number(yearText);
-  if (!day || !month || !year || year < 1900) return null;
-
-  const date = new Date(Date.UTC(year, month - 1, day));
-  const isValid =
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day &&
-    date.getTime() <= Date.now();
-
-  return isValid ? date.toISOString().slice(0, 10) : null;
 }

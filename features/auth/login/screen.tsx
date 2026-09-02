@@ -12,8 +12,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 import { FormInput, PrimaryButton } from '@/components/form';
+import { authErrorKey } from '@/lib/auth-errors';
 import { useLocalization } from '@/lib/localization-context';
 import { useOnboarding } from '@/lib/onboarding-context';
 import { useResponsiveLayout } from '@/lib/responsive';
@@ -46,7 +48,7 @@ export default function LoginScreen() {
     const { error } = await signIn(email, password, rememberMe);
     setLoading(false);
     if (error) {
-      Alert.alert(t('auth.login.failed'), error.message);
+      Alert.alert(t('auth.login.failed'), t(authErrorKey(error)));
       return;
     }
     await onboarding.complete();
@@ -177,19 +179,14 @@ export default function LoginScreen() {
             </Pressable>
 
             {appleAvailable && (
-              <Pressable
-                disabled={Boolean(socialLoading) || loading}
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                cornerRadius={12}
                 onPress={handleAppleLogin}
-                style={({ pressed }) => [
-                  styles.socialButton,
-                  styles.appleButton,
-                  (pressed || socialLoading === 'apple') && styles.socialButtonPressed,
-                ]}>
-                <Text style={styles.appleIcon}></Text>
-                <Text style={styles.appleText}>
-                  {socialLoading === 'apple' ? t('auth.login.socialLoading') : t('auth.login.apple')}
-                </Text>
-              </Pressable>
+                style={[styles.appleNativeButton, (Boolean(socialLoading) || loading) && styles.socialButtonDisabled]}
+                pointerEvents={Boolean(socialLoading) || loading ? 'none' : 'auto'}
+              />
             )}
           </View>
 

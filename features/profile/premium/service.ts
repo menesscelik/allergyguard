@@ -45,19 +45,6 @@ export async function getPremiumStatus(userId: string) {
   };
 }
 
-export async function redeemPromoCode(code: string) {
-  const result = await supabase.rpc('redeem_promo_code', { p_code: code });
-  return {
-    ...result,
-    data: result.data as {
-      success: boolean;
-      message_key: string;
-      premium_until?: string;
-      premium_days?: number;
-    } | null,
-  };
-}
-
 export async function loadStoreProducts(userId: string) {
   return getPremiumProducts(userId);
 }

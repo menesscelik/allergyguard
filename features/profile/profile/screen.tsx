@@ -1,19 +1,11 @@
 import { styles } from './styles';
-import {
-  deleteAccount,
-  getProfileStats,
-  getProfile,
-  notificationsEnabled,
-  setNotificationsEnabled,
-  signOut,
-  updateProfile,
-} from './service';
+import { deleteAccount, getProfile, notificationsEnabled, setNotificationsEnabled, signOut } from './service';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { FormInput, PRIMARY, PrimaryButton } from '@/components/form';
+import { PRIMARY } from '@/components/form';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth-context';
@@ -21,24 +13,13 @@ import { useLocalization } from '@/lib/localization-context';
 import { useResponsiveLayout } from '@/lib/responsive';
 import type { Profile } from '@/lib/types';
 
-type ProfileStats = {
-  allergyCount: number;
-  totalChecks: number;
-  riskyChecks: number;
-};
-
-export default function ProfileScreen() {
+export default function SettingsScreen() {
   const { session } = useAuth();
   const { t, language, setLanguage: changeLanguage } = useLocalization();
   const layout = useResponsiveLayout();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [fullName, setFullName] = useState('');
-  const [username, setUsername] = useState('');
-  const [birthDateInput, setBirthDateInput] = useState('');
-  const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [notifsOn, setNotifsOn] = useState(true);
-  const [stats, setStats] = useState<ProfileStats>({ allergyCount: 0, totalChecks: 0, riskyChecks: 0 });
 
   useEffect(() => {
     notificationsEnabled().then(setNotifsOn);
@@ -49,10 +30,7 @@ export default function ProfileScreen() {
     const ok = await setNotificationsEnabled(value);
     if (value && !ok) {
       setNotifsOn(false);
-      Alert.alert(
-        t('profile.permissionRequired'),
-        t('profile.permissionInstructions')
-      );
+      Alert.alert(t('profile.permissionRequired'), t('profile.permissionInstructions'));
     }
   }
 
@@ -60,53 +38,13 @@ export default function ProfileScreen() {
     useCallback(() => {
       if (!session) {
         setProfile(null);
-        setFullName('');
-        setUsername('');
-        setBirthDateInput('');
-        setStats({ allergyCount: 0, totalChecks: 0, riskyChecks: 0 });
         return;
       }
-      getProfile(session.user.id)
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setProfile(data as Profile);
-            setFullName(data.full_name ?? '');
-            setUsername(data.username ?? '');
-            setBirthDateInput(formatBirthDateForDisplay(data.birth_date));
-          } else {
-            setProfile(null);
-            setFullName('');
-            setUsername('');
-            setBirthDateInput('');
-          }
-        });
-      getProfileStats().then(setStats).catch(() => {});
+      getProfile(session.user.id).then(({ data, error }) => {
+        setProfile(!error && data ? (data as Profile) : null);
+      });
     }, [session])
   );
-
-  async function handleSave() {
-    if (!session) return;
-    const normalizedUsername = username.trim().toLowerCase();
-    const birthDate = parseBirthDate(birthDateInput);
-
-    if (normalizedUsername && !/^[a-z0-9_]{3,24}$/.test(normalizedUsername)) {
-      Alert.alert(t('common.error'), t('auth.register.usernameInvalid'));
-      return;
-    }
-    if (birthDateInput.trim() && !birthDate) {
-      Alert.alert(t('common.error'), t('auth.register.birthDateInvalid'));
-      return;
-    }
-
-    setSaving(true);
-    const { error } = await updateProfile(session.user.id, fullName, normalizedUsername, birthDate ?? '');
-    setSaving(false);
-    if (error) {
-      Alert.alert(t('common.error'), error.message);
-    } else {
-      Alert.alert(t('profile.saved'), t('profile.savedMessage'));
-    }
-  }
 
   function handleSignOut() {
     Alert.alert(t('profile.signOut'), t('profile.signOutQuestion'), [
@@ -127,96 +65,49 @@ export default function ProfileScreen() {
   }
 
   function handleDeleteAccount() {
-    Alert.alert(
-      t('profile.deleteTitle'),
-      t('profile.deleteWarning'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            setDeleting(true);
-            const { error } = await deleteAccount();
-            if (error) {
-              setDeleting(false);
-              Alert.alert(t('common.error'), t('profile.deleteFailed'));
-              return;
-            }
-          },
+    Alert.alert(t('profile.deleteTitle'), t('profile.deleteWarning'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          setDeleting(true);
+          const { error } = await deleteAccount();
+          if (error) {
+            setDeleting(false);
+            Alert.alert(t('common.error'), t('profile.deleteFailed'));
+          }
         },
-      ]
-    );
+      },
+    ]);
   }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
-        automaticallyAdjustKeyboardInsets
         contentContainerStyle={[
           styles.content,
           { paddingHorizontal: layout.pagePadding, paddingTop: layout.cardGap },
         ]}
         keyboardShouldPersistTaps="handled">
-        <View style={[styles.profileHero, layout.centerContent, { padding: layout.heroPadding }]}>
+        {/* Profil kartı → düzenleme ekranı */}
+        <Pressable
+          style={({ pressed }) => [styles.profileHero, layout.centerContent, { padding: layout.heroPadding }, pressed && { opacity: 0.75 }]}
+          onPress={() => router.push('/edit-profile' as never)}>
           <View style={[styles.avatar, { width: layout.badgeSize, height: layout.badgeSize }]}>
             <Text style={styles.avatarText}>
-              {(fullName || session?.user.email || 'A').slice(0, 1).toLocaleUpperCase('tr')}
+              {(profile?.full_name || session?.user.email || 'A').slice(0, 1).toLocaleUpperCase('tr')}
             </Text>
           </View>
           <View style={styles.profileCopy}>
             <Text style={styles.eyebrow}>{t('profile.eyebrow')}</Text>
-            <Text style={styles.title}>{fullName || t('profile.fallbackName')}</Text>
+            <Text style={styles.title}>{profile?.full_name || t('profile.fallbackName')}</Text>
             <Text style={styles.heroEmail}>{session?.user.email}</Text>
           </View>
-        </View>
+          <IconSymbol name="chevron.right" size={20} color={Palette.textMuted} />
+        </Pressable>
 
-        <View style={[styles.card, layout.centerContent]}>
-          <Text style={styles.emailLabel}>{t('profile.email')}</Text>
-          <Text style={styles.email}>{session?.user.email}</Text>
-        </View>
-
-        <View style={[styles.statsRow, layout.centerContent]}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{stats.allergyCount}</Text>
-            <Text style={styles.statLabel}>{t('profile.statsAllergies')}</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{stats.totalChecks}</Text>
-            <Text style={styles.statLabel}>{t('profile.statsChecks')}</Text>
-          </View>
-          <View style={styles.statCardDanger}>
-            <Text style={styles.statValueDanger}>{stats.riskyChecks}</Text>
-            <Text style={styles.statLabel}>{t('profile.statsRisky')}</Text>
-          </View>
-        </View>
-
-        <View style={layout.centerContent}>
-          <FormInput
-            label={t('profile.fullName')}
-            value={fullName}
-            onChangeText={setFullName}
-            placeholder={t('auth.register.namePlaceholder')}
-          />
-          <FormInput
-            label={t('profile.username')}
-            value={username}
-            onChangeText={(value) => setUsername(value.replace(/\s+/g, '').toLowerCase())}
-            autoCapitalize="none"
-            autoCorrect={false}
-            maxLength={24}
-            placeholder={t('auth.register.usernamePlaceholder')}
-          />
-          <FormInput
-            label={t('profile.birthDate')}
-            value={birthDateInput}
-            onChangeText={(value) => setBirthDateInput(formatBirthDateInput(value))}
-            keyboardType="number-pad"
-            maxLength={10}
-            placeholder={t('auth.register.birthDatePlaceholder')}
-          />
-        </View>
-
+        {/* Dil */}
         <View style={layout.centerContent}>
           <Text style={styles.label}>{t('profile.language')}</Text>
         </View>
@@ -236,28 +127,22 @@ export default function ProfileScreen() {
           })}
         </View>
 
-        <View style={layout.centerContent}>
-          <PrimaryButton title={t('common.save')} onPress={handleSave} loading={saving} />
-        </View>
-
+        {/* Bildirimler */}
         <View style={[styles.settingRow, layout.centerContent]}>
           <View style={{ flex: 1 }}>
             <Text style={styles.settingTitle}>{t('profile.notifications')}</Text>
             <Text style={styles.settingDesc}>{t('profile.notificationDesc')}</Text>
           </View>
-          <Switch
-            value={notifsOn}
-            onValueChange={toggleNotifications}
-            trackColor={{ true: PRIMARY }}
-          />
+          <Switch value={notifsOn} onValueChange={toggleNotifications} trackColor={{ true: PRIMARY }} />
         </View>
 
+        {/* Diğer */}
         <View style={[styles.navGroup, layout.centerContent]}>
           <NavRow
             icon="gearshape.fill"
             tint={Palette.textSecondary}
             soft={Palette.surfaceMuted}
-            title={t('settings.title')}
+            title={t('settings.appearance')}
             onPress={() => router.push('/settings' as never)}
           />
           <NavRow
@@ -288,15 +173,6 @@ export default function ProfileScreen() {
             title={t('feedback.title')}
             onPress={() => router.push('/feedback' as never)}
           />
-          {profile?.is_admin && (
-            <NavRow
-              icon="wrench.and.screwdriver.fill"
-              tint={Palette.warning}
-              soft={Palette.warningSoft}
-              title={t('admin.title')}
-              onPress={() => router.push('/admin' as never)}
-            />
-          )}
         </View>
 
         <Pressable style={[styles.premiumCard, layout.centerContent]} onPress={() => router.push('/premium' as never)}>
@@ -304,9 +180,7 @@ export default function ProfileScreen() {
             {profile?.is_premium ? t('profile.premium') : t('profile.free')}
           </Text>
           <Text style={styles.premiumText}>
-            {profile?.is_premium
-              ? t('profile.unlimited')
-              : t('profile.freeDesc')}
+            {profile?.is_premium ? t('profile.unlimited') : t('profile.freeDesc')}
           </Text>
           <Text style={styles.premiumLink}>{t('premium.open')}</Text>
         </Pressable>
@@ -342,9 +216,7 @@ function NavRow({
   onPress: () => void;
 }) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.navRow, pressed && styles.navRowPressed]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.navRow, pressed && styles.navRowPressed]}>
       <View style={[styles.navIcon, { backgroundColor: soft }]}>
         <IconSymbol name={icon} size={16} color={tint} />
       </View>
@@ -352,35 +224,4 @@ function NavRow({
       <IconSymbol name="chevron.right" size={18} color={Palette.textMuted} />
     </Pressable>
   );
-}
-
-function formatBirthDateInput(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 4) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
-  return `${digits.slice(0, 2)}.${digits.slice(2, 4)}.${digits.slice(4)}`;
-}
-
-function formatBirthDateForDisplay(value: string | null) {
-  if (!value) return '';
-  const [year, month, day] = value.split('-');
-  if (!year || !month || !day) return '';
-  return `${day}.${month}.${year}`;
-}
-
-function parseBirthDate(value: string) {
-  const [dayText, monthText, yearText] = value.split('.');
-  const day = Number(dayText);
-  const month = Number(monthText);
-  const year = Number(yearText);
-  if (!day || !month || !year || year < 1900) return null;
-
-  const date = new Date(Date.UTC(year, month - 1, day));
-  const isValid =
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day &&
-    date.getTime() <= Date.now();
-
-  return isValid ? date.toISOString().slice(0, 10) : null;
 }

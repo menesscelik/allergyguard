@@ -199,7 +199,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Palette.border,
   },
-  evidenceText: { color: Palette.textSecondary, fontSize: 10, fontWeight: '700' },
+  evidenceText: { color: Palette.primary, fontSize: 11, fontWeight: '700', textDecorationLine: 'underline' },
   fallbackNote: {
     fontSize: 12,
     color: Palette.textSecondary,
